@@ -1,0 +1,8 @@
+.idea
+.git
+.gitattributes
+.env
+/trash
+*/__pycache__
+/__pycache__
+/venv

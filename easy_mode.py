@@ -6,6 +6,7 @@ from aiogram.dispatcher.filters.builtin import CommandStart, CommandHelp
 from aiogram.dispatcher.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 
+
 dotenv.load_dotenv()
 bot = Bot(token=os.getenv("token"))
 dp = Dispatcher(bot)

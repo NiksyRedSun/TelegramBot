@@ -1,3 +1,4 @@
+import random
 import dotenv
 import os
 from aiogram import Bot, Dispatcher, types
@@ -8,6 +9,94 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher.storage import FSMContext
+import time
+
+
+class Unit:
+    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_initiative: int):
+        self.name = s_name
+        self.story = s_story
+        self.hp = s_hp
+        self.max_hp = self.hp
+        self.attack = s_attack
+        self.initiative = s_initiative
+        self.life = True
+
+
+    def presentation(self):
+        text = [f"Ваше имя: {self.name}", f"{self.story}", f"Ваше максимальное здоровье {self.hp}",
+                f"Ваш коэффициент урона {self.attack}", f"Ваша инициатива {self.initiative}"]
+
+        return '\n'.join(text)
+
+    def fight_presentation(self):
+        text = [f"+------{self.name}------+", f"Ваше здоровье: {self.hp}/{self.max_hp}",
+                f"Ваш коэффициент урона {self.attack}", f"Ваша инициатива {self.initiative}"]
+
+        return '\n'.join(text)
+
+    def check_alive(self):
+        if self.hp <= 0:
+            self.life = False
+
+
+
+class Villian(Unit):
+
+    def presentation(self):
+        text = [f"Ваш противник: {self.name}", f"{self.story}"]
+        return '\n'.join(text)
+
+    def fight_presentation(self):
+        text = [f"+-{self.name}-+", f"Его здоровье: {self.hp}/{self.max_hp}",]
+
+        return '\n'.join(text)
+
+
+villian = Villian("Груда костей", "Несколько тысяч костей, по прикидкам в нем человек 10, не меньше", 200, 7, 4)
+
+pirate = Unit("Черная борода", "Как вы уже догадались, вы пират", 45, 5, 4)
+tatarin = Unit("Айзулбек", "Вы тут за татарина с луком", 25, 8, 4)
+viking = Unit("Сигурд", "Вы тут за викинга, вам ничего не остается кроме как махать мечом", 60, 10, 2)
+elf = Unit("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 6)
+khajiit = Unit("Рисаад", "Опция для тех, кто хочет играть за каджита", 30, 7, 5)
+gnom = Unit("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 9, 3)
+
+ids = []
+
+units_dict = {"/pirate": pirate, "/tatarin": tatarin, "/viking": viking, "/elf": elf, "/khajiit": khajiit,
+              "/gnom": gnom}
+
+alive_players = []
+death_players = []
+
+
+def round(hero, villian):
+    text = []
+    hero_init = random.randint(1, 6) + hero.initiative
+    villian_init = random.randint(1, 6) + villian.initiative
+    if villian_init > hero_init:
+        text.append(f"В этом раунде перехватывает инициативу и атакует {villian.name}")
+        hero_init = random.randint(1, 6) + hero.initiative
+        villian_init = random.randint(1, 6) + villian.initiative
+        if villian_init > hero_init:
+            damage = villian.attack + random.randint(1, 6)
+            hero.hp -= damage
+            text.append(f"Его удар попадает прямо в цель, нанеся {damage} урона")
+        else:
+            text.append(f"Однако его удар не попадает по цели")
+    else:
+        text.append(f"В этом раунде перехватывает инициативу и атакует {hero.name}")
+        hero_init = random.randint(1, 6) + hero.initiative
+        villian_init = random.randint(1, 6) + villian.initiative
+        if hero_init > villian_init:
+            damage = hero.attack + random.randint(1, 6)
+            villian.hp -= damage
+            text.append(f"Его удар попадает прямо в цель, нанеся {damage} урона")
+        else:
+            text.append(f"Однако его удар не попадает по цели")
+    return "\n".join(text)
+
 
 
 class Test(StatesGroup):
@@ -20,8 +109,6 @@ bot = Bot(token=os.getenv("token"))
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-ids = [372178038, 218656239]
-
 
 def save_id(message):
     global ids
@@ -32,104 +119,105 @@ def save_id(message):
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
     save_id(message)
-    await message.answer(text=f"Ну че, ебаный в рот, погнали нахуй {message.chat.id}")
-
-
-@dp.message_handler(CommandHelp())
-async def bot_help(message: types.Message):
-    text = ("Список команд: ",
-            "/start - Начать диалог",
-            "/help - Получить справку",
-            "/menu - Загрузить меню")
-
-    await message.answer("\n".join(text))
-
-
-
-@dp.message_handler(Command("show_ids"))
-async def show_menu(message: types.Message):
-    text = [str(i) for i in ids]
-    await message.answer("\n".join(text), parse_mode="HTML")
-
-
-
-@dp.message_handler(Command("send_spam"))
-async def spam(message):
-    global ids
-    for i in ids:
-        await bot.send_message(i, text="Spam")
-
-
-@dp.message_handler(Command("menu"))
-async def bot_start(message: types.Message):
     menu = ReplyKeyboardMarkup(
-        keyboard=[
-            [
-            KeyboardButton(text="/menu")
-            ]
-        ],
-        resize_keyboard=True
-    )
-    await message.answer(text="Ну че, ебаный в рот, погнали нахуй", reply_markup=menu)
+        keyboard=[[KeyboardButton(text="Старт")]], resize_keyboard=True, one_time_keyboard=True)
+    await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"
+                              f"Нажмите на старт, чтобы начать", reply_markup=menu)
 
 
-@dp.message_handler(Text("Просто текст"), IDFilter(218656239))
-async def bot_help(message: types.Message):
-    await message.answer(text="Just text")
 
-
-@dp.message_handler(Command("test"), state=None) #сюда будут попадать все команды тест, если у них не установлено состояние
-async def bot_test(message: types.Message):
-    await message.answer(text="Тестирование начато\n"
-                              "Вопрос 1\n"
-                         "Ответь да или нет?\n"
-                         "После отправки этого сообщения я задам тебе как пользователю состояние ответа на первое сообщение\n"
-                         "Следующее сообщение будет рассматриваться как твой ответ")
+@dp.message_handler(Text("Старт"), state=None)
+async def bot_choice(message: types.Message):
+    await message.answer(text="Выберите персонажа:\n"
+                              "/pirate - пират\n"
+                              "/tatarin - татарин\n"
+                              "/viking - викинг\n"
+                              "/elf - эльф\n"
+                              "/khajiit - каджит\n"
+                              "/gnom - гном\n")
     await Test.Q1.set()
 
 
-@dp.message_handler(state=Test.Q1) #здесь будет перехват ответа пользователя на первый вопрос, если у пользователя
-                                    #есть какое-то состояние, то он попадет только в хэндлер считывания этого состояния
-async def answer_q1(message: types.Message, state: FSMContext):
-    answer = message.text
-    await state.update_data(answer1=answer)
-    await message.answer(text="Вопрос 2\n"
-                         "Реально ну скажи, да или нет \n"
-                         "Как только ты ответишь я задам тебе как пользователю состояние ответа на второе сообщение")
-    await Test.Q2.set() #переводит состояние пользователя в состояние отправки второго сообщения
-
-@dp.message_handler(state=Test.Q2)
-async def answer_q2(message: types.Message, state: FSMContext):
+@dp.message_handler(state=Test.Q1)
+async def before_fight(message: types.Message, state: FSMContext):
+    await state.update_data(unit=units_dict[message.text])
     data = await state.get_data()
-    answer1 = data.get("answer1")
-    answer2 = message.text
-    await message.answer(text=f"Cпасибо за ваши ответы {answer1} и {answer2}")
-    await message.answer(text=f"Ответ 1: {answer1}")
-    await message.answer(text=f"Ответ 2: {answer2}")
-
-    # await state.finish() # сбрасывается состояние и данные, которые в нем сохранены
-    await state.reset_state(with_data=False) #сбросит состояние, но сохранит данные в data
-
-
-@dp.message_handler(state="EnterEmail") #пример с установлением состояния гораздо более простым способом
-async def bot_test2(message: types.Message, state: FSMContext):
-    email = message.text
-    await state.update_data(email=email)
-    await message.answer(text="Ваш мэйл записан")
+    text = data.get("unit").presentation()
     await state.reset_state(with_data=False)
+    await message.answer(text=text)
+    await message.answer(text=villian.presentation())
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Начать бой")]], resize_keyboard=True, one_time_keyboard=True)
+    await message.answer(text=f"Нажмите на кнопку \"Начать бой\", когда все будут готовы", reply_markup=menu)
 
 
-@dp.message_handler(Command("test2")) #пример с установлением состояния гораздо более простым способом
-async def bot_set_state_test2(message: types.Message, state: FSMContext):
-    await message.answer(text="После этого сообщения пользователю будет установлено состояние на отправку мыла")
-    await state.set_state("EnterEmail")
 
-
-@dp.message_handler(Command("mail")) #пример с установлением состояния гораздо более простым способом
-async def bot_test2(message: types.Message, state: FSMContext):
+@dp.message_handler(Text("Начать бой"))
+async def start_fight(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    email = data.get("email")
-    await message.answer(text=f"Ваш мэйл записан: {email}")
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Атаковать")]], resize_keyboard=True)
+    await message.answer(text=villian.fight_presentation())
+    await message.answer(text=data.get("unit").fight_presentation(), reply_markup=menu)
+
+
+
+@dp.message_handler(Text("Атаковать"))
+async def attack(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    unit = data.get("unit")
+    text = round(unit, villian)
+    villian.check_alive()
+    unit.check_alive()
+    if not unit.life:
+        await Test.Q2.set()
+        death_players.append(unit.name)
+        await message.answer(text=text)
+        await message.answer(text="В общем-то вы отъехали, ожидайте завершения боя")
+        await message.answer(text="/vil_alive - проверить жив ли злодей")
+        return None
+    if not villian.life:
+        alive_players.append(unit.name)
+        if death_players:
+            text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых, " + \
+                   ", ".join(death_players) + "мертвы, да упокоятся их души"
+            await message.answer(text=text)
+        else:
+            text = "Вот они наши герои слева направо: " + ", ".join(alive_players)
+            await message.answer(text=text)
+        return None
+    await state.update_data(unit=unit)
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Атаковать")]], resize_keyboard=True)
+    await message.answer(text=text)
+    await message.answer(text=villian.fight_presentation())
+    await message.answer(text=data.get("unit").fight_presentation(), reply_markup=menu)
+
+
+@dp.message_handler(state=Test.Q2 or Command("vil_alive"))
+async def attack(message: types.Message, state: FSMContext):
+    villian.check_alive()
+    if not villian.life:
+        text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых, " + \
+                ", ".join(death_players) + "мертвы, да упокоятся их души"
+        await message.answer(text=text)
+        await state.reset_state(with_data=False)
+    else:
+        await message.answer(text="Злодей все еще жив")
+        await message.answer(text="/vil_alive проверить злодея еще раз")
+
+
+@dp.message_handler(Command("restart")) #пример с установлением состояния гораздо более простым способом
+async def bot_set_state_test2(message: types.Message, state: FSMContext):
+    alive_players.clear()
+    death_players.clear()
+    villian = Villian("Груда костей", "Несколько тысяч костей, по прикидкам в нем человек 10, не меньше", 200, 7, 4)
+    await state.reset_state(with_data=False)
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Старт")]], resize_keyboard=True, one_time_keyboard=True)
+    await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"
+                              f"Нажмите на старт, чтобы начать", reply_markup=menu)
+
 
 
 print("Если ты видишь это сообщение, значит бот в игре")

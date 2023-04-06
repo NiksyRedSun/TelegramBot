@@ -20,7 +20,7 @@ class Unit:
         self.max_hp = self.hp
         self.attack = s_attack
         self.initiative = s_initiative
-        self.life = True
+        self.alive = True
 
 
     def presentation(self):
@@ -37,7 +37,7 @@ class Unit:
 
     def check_alive(self):
         if self.hp <= 0:
-            self.life = False
+            self.alive = False
 
 
 
@@ -60,7 +60,7 @@ tatarin = Unit("Айзулбек", "Вы тут за татарина с лук�
 viking = Unit("Сигурд", "Вы тут за викинга, вам ничего не остается кроме как махать мечом", 60, 10, 2)
 elf = Unit("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 6)
 khajiit = Unit("Рисаад", "Опция для тех, кто хочет играть за каджита", 30, 7, 5)
-gnom = Unit("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 9, 3)
+gnom = Unit("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 8, 3)
 
 ids = []
 
@@ -69,6 +69,7 @@ units_dict = {"/pirate": pirate, "/tatarin": tatarin, "/viking": viking, "/elf":
 
 alive_players = []
 death_players = []
+players = 0
 
 
 def round(hero, villian):
@@ -140,7 +141,9 @@ async def bot_choice(message: types.Message):
 
 @dp.message_handler(state=Test.Q1)
 async def before_fight(message: types.Message, state: FSMContext):
+    global players
     await state.update_data(unit=units_dict[message.text])
+    players = players + 1
     data = await state.get_data()
     text = data.get("unit").presentation()
     await state.reset_state(with_data=False)
@@ -169,22 +172,25 @@ async def attack(message: types.Message, state: FSMContext):
     text = round(unit, villian)
     villian.check_alive()
     unit.check_alive()
-    if not unit.life:
+    if not unit.alive:
         await Test.Q2.set()
         death_players.append(unit.name)
         await message.answer(text=text)
         await message.answer(text="В общем-то вы отъехали, ожидайте завершения боя")
-        await message.answer(text="/vil_alive - проверить жив ли злодей")
+        menu = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="/vil_alive")]], resize_keyboard=True)
+        await message.answer(text="/vil_alive - проверить жив ли злодей", reply_markup=menu)
         return None
-    if not villian.life:
+    if not villian.alive:
         alive_players.append(unit.name)
         if death_players:
-            text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых, " + \
-                   ", ".join(death_players) + "мертвы, да упокоятся их души"
+            text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых\n" + ", ".join(death_players) + " - мертвы, да упокоятся их души"
             await message.answer(text=text)
         else:
-            text = "Вот они наши герои слева направо: " + ", ".join(alive_players)
-            await message.answer(text=text)
+            text = "Похоже героям сегодня удалось победить злодея.\nВот они слева направо: " + ", ".join(alive_players) + "\n/restart - попробовать еще раз"
+            menu = ReplyKeyboardMarkup(
+                keyboard=[[KeyboardButton(text="/restart")]], resize_keyboard=True)
+            await message.answer(text=text, reply_markup=menu)
         return None
     await state.update_data(unit=unit)
     menu = ReplyKeyboardMarkup(
@@ -197,22 +203,32 @@ async def attack(message: types.Message, state: FSMContext):
 @dp.message_handler(state=Test.Q2 or Command("vil_alive"))
 async def attack(message: types.Message, state: FSMContext):
     villian.check_alive()
-    if not villian.life:
-        text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых, " + \
-                ", ".join(death_players) + "мертвы, да упокоятся их души"
-        await message.answer(text=text)
-        await state.reset_state(with_data=False)
-    else:
-        await message.answer(text="Злодей все еще жив")
-        await message.answer(text="/vil_alive проверить злодея еще раз")
+    if not villian.alive:
+        if death_players:
+            text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых, " + \
+                   ", ".join(death_players) + "мертвы, да упокоятся их души"
+            await state.reset_state()
+            await message.answer(text=text)
+        else:
+            text = "Похоже героям сегодня удалось победить злодея.\nВот они слева направо: " + ", ".join(alive_players)
+            await state.reset_state()
+            await message.answer(text=text)
+            return None
+    if len(death_players) == players:
+        await message.answer(text="Все просто поотъезжали, ну и все\n /restart - чтобы попробовать еще раз")
+        await state.reset_state()
+        return None
+    await message.answer(text="Злодей все еще жив")
+    await message.answer(text="/vil_alive проверить злодея еще раз")
 
 
-@dp.message_handler(Command("restart")) #пример с установлением состояния гораздо более простым способом
+@dp.message_handler(Command("restart"))
 async def bot_set_state_test2(message: types.Message, state: FSMContext):
     alive_players.clear()
     death_players.clear()
+    players = 0
     villian = Villian("Груда костей", "Несколько тысяч костей, по прикидкам в нем человек 10, не меньше", 200, 7, 4)
-    await state.reset_state(with_data=False)
+    await state.reset_state()
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Старт")]], resize_keyboard=True, one_time_keyboard=True)
     await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"

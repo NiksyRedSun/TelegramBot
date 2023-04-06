@@ -12,6 +12,16 @@ from aiogram.dispatcher.storage import FSMContext
 import time
 
 
+def rate_limit(limit: int, key=None):
+    def decorator(func):
+        setattr(func, "throttling_rate_limit", limit)
+        if key:
+            setattr(func, "throttling_key", key)
+        return func
+    return decorator
+
+
+
 class Unit:
     def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_initiative: int):
         self.name = s_name
@@ -170,7 +180,7 @@ async def start_fight(message: types.Message, state: FSMContext):
     await message.answer(text=data.get("unit").fight_presentation(), reply_markup=menu)
 
 
-
+@rate_limit(limit=10)
 @dp.message_handler(Text("Атаковать"))
 async def attack(message: types.Message, state: FSMContext):
     data = await state.get_data()

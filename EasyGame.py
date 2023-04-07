@@ -286,12 +286,10 @@ async def attack(message: types.Message, state: FSMContext):
             text = "Злодей побежден " + ", ".join(alive_players) + " - при этом остались в живых\n" + ", ".join(death_players) + " - мертвы, да упокоятся их души"
             await message.answer(text=text)
             await restart_message(message)
-            await Test.Q2.set()
         else:
             text = "Похоже героям сегодня удалось победить злодея.\nВот они слева направо: " + ", ".join(alive_players)
             await message.answer(text=text)
             await restart_message(message)
-            await Test.Q2.set()
         return None
     await state.update_data(unit=unit)
     menu = ReplyKeyboardMarkup(

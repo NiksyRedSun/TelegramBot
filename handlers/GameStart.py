@@ -19,14 +19,7 @@ from GameClasses import Unit, Villian
 from functions import round, restart_message, save_id
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, alive_players, death_players, players
 from SomeStates import Test
-
-
-dotenv.load_dotenv()
-bot = Bot(token=os.getenv("token"))
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
-dp.middleware.setup(ThrottlingMiddleware())
-
+from EasyGameLoader import dp
 
 
 @dp.message_handler(CommandStart())
@@ -49,9 +42,3 @@ async def bot_choice(message: types.Message):
                               "/khajiit - каджит\n"
                               "/gnom - гном\n")
     await Test.Q1.set()
-
-
-
-print("Если ты видишь это сообщение, значит бот в игре")
-
-executor.start_polling(dp)

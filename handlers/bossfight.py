@@ -19,7 +19,7 @@ from GameClasses import Unit, Villian
 from functions import round, restart_message
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, alive_players, death_players, players
 from SomeStates import Test
-from EasyGame import dp
+from EasyGameLoader import dp
 
 
 

@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 
-from EasyGame import dp
+from EasyGameLoader import dp
 from .throttling import ThrottlingMiddleware
 
 

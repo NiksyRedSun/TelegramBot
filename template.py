@@ -20,19 +20,14 @@ bot = Bot(token=os.getenv("token"))
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-ids = [372178038, 218656239]
 
 
-def save_id(message):
-    global ids
-    if message.chat.id not in ids:
-        ids.append(message.chat.id)
 
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    save_id(message)
-    await message.answer(text=f"Ну че, ебаный в рот, погнали нахуй {message.chat.id}")
+    await message.answer(text=f"Ну че, погнали народ")
+
 
 
 @dp.message_handler(CommandHelp())
@@ -45,21 +40,6 @@ async def bot_help(message: types.Message):
     await message.answer("\n".join(text))
 
 
-
-@dp.message_handler(Command("show_ids"))
-async def show_menu(message: types.Message):
-    text = [str(i) for i in ids]
-    await message.answer("\n".join(text), parse_mode="HTML")
-
-
-
-@dp.message_handler(Command("send_spam"))
-async def spam(message):
-    global ids
-    for i in ids:
-        await bot.send_message(i, text="Spam")
-
-
 @dp.message_handler(Command("menu"))
 async def bot_start(message: types.Message):
     menu = ReplyKeyboardMarkup(
@@ -70,10 +50,10 @@ async def bot_start(message: types.Message):
         ],
         resize_keyboard=True
     )
-    await message.answer(text="Ну че, ебаный в рот, погнали нахуй", reply_markup=menu)
+    await message.answer(text="Ну че, погнали народ", reply_markup=menu)
 
 
-@dp.message_handler(Text("Просто текст"), IDFilter(218656239))
+@dp.message_handler(Text("Просто текст"))
 async def bot_help(message: types.Message):
     await message.answer(text="Just text")
 

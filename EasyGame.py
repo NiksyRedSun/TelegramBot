@@ -14,139 +14,13 @@ from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
-import time
-from utils.misc import rate_limit
+from RateLimit import rate_limit, ThrottlingMiddleware
+from GameClasses import Unit, Villian
+from functions import round
 
-
-
-def rate_limit(limit: int, key=None):
-    """
-    Decorator for configuring rate limit and key in different functions.
-
-    :param limit:
-    :param key:
-    :return:
-    """
-
-    def decorator(func):
-        setattr(func, 'throttling_rate_limit', limit)
-        if key:
-            setattr(func, 'throttling_key', key)
-        return func
-
-    return decorator
-
-
-class ThrottlingMiddleware(BaseMiddleware):
-    """
-    Simple middleware
-    """
-
-    def __init__(self, limit=DEFAULT_RATE_LIMIT, key_prefix='antiflood_'):
-        self.rate_limit = limit
-        self.prefix = key_prefix
-        super(ThrottlingMiddleware, self).__init__()
-
-    async def on_process_message(self, message: types.Message, data: dict):
-        """
-        This handler is called when dispatcher receives a message
-
-        :param message:
-        """
-        # Get current handler
-        handler = current_handler.get()
-
-        # Get dispatcher from context
-        dispatcher = Dispatcher.get_current()
-        # If handler was configured, get rate limit and key from handler
-        if handler:
-            limit = getattr(handler, 'throttling_rate_limit', self.rate_limit)
-            key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
-        else:
-            limit = self.rate_limit
-            key = f"{self.prefix}_message"
-
-        # Use Dispatcher.throttle method.
-        try:
-            await dispatcher.throttle(key, rate=limit)
-        except Throttled as t:
-            # Execute action
-            await self.message_throttled(message, t)
-
-            # Cancel current handler
-            raise CancelHandler()
-
-    async def message_throttled(self, message: types.Message, throttled: Throttled):
-        """
-        Notify user only on first exceed and notify about unlocking only on last exceed
-
-        :param message:
-        :param throttled:
-        """
-        handler = current_handler.get()
-        dispatcher = Dispatcher.get_current()
-        if handler:
-            key = getattr(handler, 'throttling_key', f"{self.prefix}_{handler.__name__}")
-        else:
-            key = f"{self.prefix}_message"
-
-        # Calculate how many time is left till the block ends
-        delta = throttled.rate - throttled.delta
-
-        # Prevent flooding
-
-        # Sleep.
-        await asyncio.sleep(delta)
-
-        # Check lock status
-        thr = await dispatcher.check_key(key)
-
-        # If current message is not last with current key - do not send message
-
-
-class Unit:
-    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_initiative: int):
-        self.name = s_name
-        self.story = s_story
-        self.hp = s_hp
-        self.max_hp = self.hp
-        self.attack = s_attack
-        self.initiative = s_initiative
-        self.alive = True
-
-
-    def presentation(self):
-        text = [f"Ваше имя: {self.name}", f"{self.story}", f"Ваше максимальное здоровье {self.hp}",
-                f"Ваш коэффициент урона {self.attack}", f"Ваша инициатива {self.initiative}"]
-
-        return '\n'.join(text)
-
-    def fight_presentation(self):
-        text = [f"+------{self.name}------+", f"Ваше здоровье: {self.hp}/{self.max_hp}",
-                f"Ваш коэффициент урона {self.attack}", f"Ваша инициатива {self.initiative}"]
-
-        return '\n'.join(text)
-
-    def check_alive(self):
-        if self.hp <= 0:
-            self.alive = False
-
-
-
-class Villian(Unit):
-
-    def presentation(self):
-        text = [f"Ваш противник: {self.name}", f"{self.story}"]
-        return '\n'.join(text)
-
-    def fight_presentation(self):
-        text = [f"+-{self.name}-+", f"Его здоровье: {self.hp}/{self.max_hp}",]
-
-        return '\n'.join(text)
 
 
 villian = Villian("Груда костей", "Несколько тысяч костей, по прикидкам в нем человек 10, не меньше", 200, 7, 4)
-
 pirate = Unit("Черная борода", "Как вы уже догадались, вы пират", 45, 5, 4)
 tatarin = Unit("Айзулбек", "Вы тут за татарина с луком", 25, 8, 4)
 viking = Unit("Сигурд", "Вы тут за викинга, вам ничего не остается кроме как махать мечом", 60, 10, 2)
@@ -164,31 +38,6 @@ death_players = []
 players = 0
 
 
-def round(hero: Unit, vilian: Unit):
-    text = []
-    hero_init = random.randint(1, 6) + hero.initiative
-    villian_init = random.randint(1, 6) + vilian.initiative
-    if villian_init > hero_init:
-        text.append(f"В этом раунде перехватывает инициативу и атакует {vilian.name}")
-        hero_init = random.randint(1, 6) + hero.initiative
-        villian_init = random.randint(1, 6) + vilian.initiative
-        if villian_init > hero_init:
-            damage = vilian.attack + random.randint(1, 6)
-            hero.hp -= damage
-            text.append(f"Его удар попадает прямо в цель, нанеся {damage} урона")
-        else:
-            text.append(f"Однако его удар не попадает по цели")
-    else:
-        text.append(f"В этом раунде перехватывает инициативу и атакует {hero.name}")
-        hero_init = random.randint(1, 6) + hero.initiative
-        villian_init = random.randint(1, 6) + vilian.initiative
-        if hero_init > villian_init:
-            damage = hero.attack + random.randint(1, 6)
-            vilian.hp -= damage
-            text.append(f"Его удар попадает прямо в цель, нанеся {damage} урона")
-        else:
-            text.append(f"Однако его удар не попадает по цели")
-    return "\n".join(text)
 
 
 async def restart_message(message):

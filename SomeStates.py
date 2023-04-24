@@ -1,6 +1,6 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
-class Test(StatesGroup):
-    Q1 = State()
+class GameState(StatesGroup):
+    menuState = State()
     Q2 = State()

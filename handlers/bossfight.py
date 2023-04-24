@@ -18,28 +18,14 @@ from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
 from functions import round, restart_message
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, alive_players, death_players, players
-from SomeStates import Test
+from SomeStates import GameState
 from EasyGameLoader import dp
 
 
 
-@dp.message_handler(state=Test.Q1)
-async def before_fight(message: types.Message, state: FSMContext):
-    global players
-    await state.update_data(unit=units_dict[message.text])
-    players = players + 1
-    data = await state.get_data()
-    text = data.get("unit").presentation()
-    await state.reset_state(with_data=False)
-    await message.answer(text=text)
-    await message.answer(text=villian.presentation())
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Начать бой")]], resize_keyboard=True, one_time_keyboard=True)
-    await message.answer(text=f"Нажмите на кнопку \"Начать бой\", когда все будут готовы", reply_markup=menu)
 
 
-
-@dp.message_handler(Text("Начать бой"))
+@dp.message_handler(Text("Бой с боссом"))
 async def start_fight(message: types.Message, state: FSMContext):
     data = await state.get_data()
     menu = ReplyKeyboardMarkup(
@@ -57,7 +43,7 @@ async def attack(message: types.Message, state: FSMContext):
     villian.check_alive()
     unit.check_alive()
     if not unit.alive:
-        await Test.Q2.set()
+        await GameState.Q2.set()
         death_players.append(unit.name)
         await message.answer(text=text)
         await message.answer(text="В общем-то вы отъехали, ожидайте завершения боя")
@@ -84,7 +70,7 @@ async def attack(message: types.Message, state: FSMContext):
     await message.answer(text=data.get("unit").fight_presentation(), reply_markup=menu)
 
 
-@dp.message_handler(state=Test.Q2 or Command("vil_alive"))
+@dp.message_handler(state=GameState.Q2 or Command("vil_alive"))
 async def check_villian(message: types.Message, state: FSMContext):
     villian.check_alive()
     if not villian.alive:

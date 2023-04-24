@@ -18,7 +18,7 @@ from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
 from functions import round, restart_message, save_id
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, alive_players, death_players, players
-from SomeStates import Test
+from SomeStates import GameState
 from EasyGameLoader import dp
 
 
@@ -41,4 +41,20 @@ async def bot_choice(message: types.Message):
                               "/elf - эльф\n"
                               "/khajiit - каджит\n"
                               "/gnom - гном\n")
-    await Test.Q1.set()
+    await GameState.menuState.set()
+
+
+@dp.message_handler(state=GameState.menuState)
+async def before_fight(message: types.Message, state: FSMContext):
+    global players
+    await state.update_data(unit=units_dict[message.text])
+    players = players + 1
+    data = await state.get_data()
+    text = data.get("unit").presentation()
+    await state.reset_state(with_data=False)
+    await message.answer(text=text)
+    await message.answer(text=villian.presentation())
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
+                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")]], resize_keyboard=True)
+    await message.answer(text=f"Нажмите на кнопку \"Начать бой\", когда все будут готовы", reply_markup=menu)

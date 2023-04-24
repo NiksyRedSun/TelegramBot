@@ -6,6 +6,6 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from EasyGameLoader import dp
 
 
-@dp.message_handler(Text("Магазин"))
+@dp.message_handler(Text("Инвентарь"))
 async def start_fight(message: types.Message):
     await message.answer(text="Функционал в разработке")

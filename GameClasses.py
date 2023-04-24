@@ -8,11 +8,12 @@ class Unit:
         self.attack = s_attack
         self.initiative = s_initiative
         self.alive = True
+        self.money = 0
 
 
     def presentation(self):
         text = [f"Ваше имя: {self.name}", f"{self.story}", f"Ваше максимальное здоровье {self.hp}",
-                f"Ваш коэффициент урона {self.attack}", f"Ваша инициатива {self.initiative}"]
+                f"Ваш коэффициент урона {self.attack}", f"Ваша инициатива {self.initiative}", f"Ваше золото {self.money}"]
 
         return '\n'.join(text)
 

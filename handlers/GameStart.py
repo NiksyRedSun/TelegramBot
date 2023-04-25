@@ -16,8 +16,8 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from functions import round, restart_message, save_id
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, alive_players, death_players, players
+from functions import round, restart_message, save_id, next, menu_keyboard
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players, players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp
 
@@ -29,7 +29,7 @@ async def bot_start(message: types.Message):
         keyboard=[[KeyboardButton(text="Старт")]], resize_keyboard=True, one_time_keyboard=True)
     await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"
                               f"Нажмите на старт, чтобы начать", reply_markup=menu)
-
+    players_dict[message.chat.id] = None
 
 
 @dp.message_handler(Text("Старт"), state=None)
@@ -41,20 +41,33 @@ async def bot_choice(message: types.Message):
                               "/elf - эльф\n"
                               "/khajiit - каджит\n"
                               "/gnom - гном\n")
+    await GameState.charChoice.set()
+
+
+@dp.message_handler(state=GameState.charChoice)
+async def after_choice(message: types.Message, state: FSMContext):
+    players_dict[message.chat.id] = units_dict[message.text]
+    await GameState.nameChoice.set()
+    await message.answer(text="Придумайте себе имя, отправьте его сообщением")
+
+
+@dp.message_handler(state=GameState.nameChoice)
+async def after_choice(message: types.Message, state: FSMContext):
+    players_dict[message.chat.id].name = message.text
+    text = players_dict[message.chat.id].presentation()
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="В меню")]], resize_keyboard=True)
+    await message.answer(text=text, reply_markup=menu)
     await GameState.menuState.set()
 
 
 @dp.message_handler(state=GameState.menuState)
 async def before_fight(message: types.Message, state: FSMContext):
-    global players
-    await state.update_data(unit=units_dict[message.text])
-    players = players + 1
-    data = await state.get_data()
-    text = data.get("unit").presentation()
-    await state.reset_state(with_data=False)
-    await message.answer(text=text)
-    await message.answer(text=villian.presentation())
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
-                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")]], resize_keyboard=True)
-    await message.answer(text=f"Нажмите на кнопку \"Начать бой\", когда все будут готовы", reply_markup=menu)
+    if message.text == "Бой с боссом":
+        await GameState.preBossFight.set()
+        await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next())
+        await message.answer(text=villian.presentation(), reply_markup=next())
+    elif message.text in ["Бой с мобом", "Магазин", "Инвентарь"]:
+        await message.answer(text=f"Функционал в разработке", reply_markup=next())
+    else:
+        await message.answer(text=f"Выберите чем хотите заниматься", reply_markup=menu_keyboard())

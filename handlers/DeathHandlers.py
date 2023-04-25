@@ -16,13 +16,12 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from functions import round, restart_message, save_id
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players
+from functions import round, restart_message, save_id, next, menu_keyboard
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players, players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp
-import handlers
 
 
-if __name__ == '__main__':
-    print("Если ты видишь это сообщение, значит бот в игре")
-    executor.start_polling(dp)
+@dp.message_handler(state=GameState.deadState)
+async def after_choice(message: types.Message, state: FSMContext):
+    await message.answer(text="Вы сейчас мертвы, я еще не решил, что с вами делать", reply_markup=next())

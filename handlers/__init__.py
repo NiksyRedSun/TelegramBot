@@ -3,4 +3,5 @@ from . import fight
 from . import shop
 from . import GameStart
 from . import Inventory
+from . import DeathHandlers
 

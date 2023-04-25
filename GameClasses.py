@@ -27,6 +27,10 @@ class Unit:
         if self.hp <= 0:
             self.alive = False
 
+    def reset(self):
+        self.alive = True
+        self.hp = self.max_hp
+
 
 
 class Villian(Unit):

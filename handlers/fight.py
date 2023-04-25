@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.builtin import CommandStart, CommandHelp, Text, 
 from aiogram.dispatcher.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from aiogram.dispatcher.storage import FSMContext
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, alive_players, death_players, players
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players
 from SomeStates import GameState
 from EasyGameLoader import dp
 

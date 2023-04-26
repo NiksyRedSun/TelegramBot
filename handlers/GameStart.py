@@ -16,8 +16,8 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from functions import round, restart_message, save_id, next, menu_keyboard
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players, players_dict
+from Functions import round, save_id, next, menu_keyboard
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict, testChar
 from SomeStates import GameState
 from EasyGameLoader import dp
 
@@ -40,7 +40,8 @@ async def bot_choice(message: types.Message):
                               "/viking - викинг\n"
                               "/elf - эльф\n"
                               "/khajiit - каджит\n"
-                              "/gnom - гном\n")
+                              "/gnom - гном\n"
+                              "/testChar - под тест\n")
     await GameState.charChoice.set()
 
 
@@ -67,7 +68,10 @@ async def before_fight(message: types.Message, state: FSMContext):
         await GameState.preBossFight.set()
         await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next())
         await message.answer(text=villian.presentation(), reply_markup=next())
+    elif message.text == "Персонаж":
+        text = players_dict[message.chat.id].presentation()
+        await message.answer(text=text)
     elif message.text in ["Бой с мобом", "Магазин", "Инвентарь"]:
-        await message.answer(text=f"Функционал в разработке", reply_markup=next())
+        await message.answer(text=f"Функционал в разработке")
     else:
         await message.answer(text=f"Выберите чем хотите заниматься", reply_markup=menu_keyboard())

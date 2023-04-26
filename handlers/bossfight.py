@@ -16,8 +16,8 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from functions import round, restart_message, save_id, next, menu_keyboard, attack_menu, boss_end_players_list
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players, current_boss_fight_team, players_dict
+from Functions import round, save_id, next, menu_keyboard, attack_menu, boss_end, money_dealing
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team, players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp
 
@@ -39,6 +39,7 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
         await message.answer(text="Решите для себя, готовы ли вы\nСпросите у друзей, готовы ли они", reply_markup=menu)
 
 
+
 @rate_limit(limit=0.75)
 @dp.message_handler(state=GameState.bossFight)
 async def boss_fight(message: types.Message, state: FSMContext):
@@ -52,8 +53,9 @@ async def boss_fight(message: types.Message, state: FSMContext):
         return None
     if not villian.alive:
         await message.answer(text="Ваш противник повержен")
-        await message.answer(text=boss_end_players_list(current_boss_fight_team, players_dict), reply_markup=next())
+        await message.answer(text=boss_end(current_boss_fight_team, players_dict), reply_markup=next())
         await GameState.menuState.set()
+        await money_dealing(current_boss_fight_team, villian, message, players_dict)
         current_boss_fight_team.clear()
         villian.reset()
         return None

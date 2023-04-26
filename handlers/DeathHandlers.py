@@ -16,8 +16,8 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from functions import round, restart_message, save_id, next, menu_keyboard
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players, players_dict
+from Functions import round, save_id, next, menu_keyboard
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp
 

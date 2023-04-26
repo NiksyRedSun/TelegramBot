@@ -1,7 +1,7 @@
 import random
 from GameClasses import Unit, Villian
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict
 
 
 def double_dices():
@@ -38,11 +38,6 @@ def round(hero: Unit, vilian: Unit):
     return "\n".join(text)
 
 
-async def restart_message(message):
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="/restart")]], resize_keyboard=True)
-    await message.answer(text="/restart - чтобы попробовать еще раз",
-                         reply_markup=menu)
 
 def save_id(message, ids):
     if message.chat.id not in ids:
@@ -57,7 +52,7 @@ def next():
 def menu_keyboard():
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
-                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")]], resize_keyboard=True)
+                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
     return menu
 
 def attack_menu():
@@ -65,15 +60,17 @@ def attack_menu():
         keyboard=[[KeyboardButton(text="Атаковать")]], resize_keyboard=True)
     return menu
 
-def boss_end_players_list(players: list, player_dict: dict):
+def boss_end(players: list, player_dict: dict):
     text = []
     if all(map(lambda x: player_dict[x].alive, players)):
+        text.append("+" + "Результаты".center(56, "-") + "+")
         text.append("Вам повезло, все остались в живых")
         text.append("Имена наших героев:")
         for id in players:
             text.append(player_dict[id].name)
         return "\n".join(text)
     else:
+        text.append("+" + "Результаты".center(56, "-") + "+")
         text.append("Битва закончена, жаль не все её пережили")
         players.sort(key=lambda x: player_dict[id].alive)
         for id in players:
@@ -83,4 +80,14 @@ def boss_end_players_list(players: list, player_dict: dict):
                 text.append(f"{player_dict[id].name} - Не вывез")
         return "\n".join(text)
 
+
+async def money_dealing(players, enemy, message, players_dict):
+    if type(players) == list:
+        cur_money = int(enemy.money/len(players))
+        for i in players:
+            players_dict[i].money += cur_money
+        await message.answer(text=f"Каждый из участников битвы получил по {cur_money} монет")
+    else:
+        players.money += enemy.money
+        await message.answer(text=f"Монстр обронил {enemy.money} монет после смерти")
 

@@ -47,6 +47,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
     text = round(unit, villian)
     villian.check_alive()
     unit.check_alive()
+    await message.answer(text=text)
     if not unit.alive:
         await GameState.deadState.set()
         await message.answer(text="Вы теперь мертв, результаты боя можете узнать у своей команды", reply_markup=next())
@@ -67,7 +68,6 @@ async def boss_fight(message: types.Message, state: FSMContext):
         return None
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Атаковать")]], resize_keyboard=True)
-    await message.answer(text=text)
     await message.answer(text=villian.fight_presentation())
     await message.answer(text=unit.fight_presentation(), reply_markup=menu)
 

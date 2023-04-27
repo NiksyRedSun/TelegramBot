@@ -1,3 +1,6 @@
+import random
+
+
 class Unit:
     def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
         self.name = s_name
@@ -8,6 +11,17 @@ class Unit:
         self.defense = s_defense
         self.initiative = s_initiative
         self.alive = True
+
+
+    def attack_damage(self, text: list):
+        crit = random.randint(1, 100)
+        if crit in range(1, self.initiative*10):
+            damage = self.attack * 2
+            text.append(f"{self.name} наносит критический удар")
+            return damage
+        else:
+            damage = self.attack
+            return damage
 
 
     def check_alive(self):

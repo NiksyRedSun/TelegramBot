@@ -21,7 +21,7 @@ def round(hero: Unit, vilian: Unit):
         hero_init = double_dices() + hero.initiative
         villian_init = double_dices() + vilian.initiative
         if villian_init > hero_init:
-            damage = vilian.attack + dice() - hero.defense
+            damage = vilian.attack_damage(text) + dice() - hero.defense
             if damage <= 0:
                 text.append(f"Его удар попадает прямо по нашему герою, но тот остается невредим")
             else:
@@ -34,7 +34,7 @@ def round(hero: Unit, vilian: Unit):
         hero_init = double_dices() + hero.initiative
         villian_init = double_dices() + vilian.initiative
         if hero_init > villian_init:
-            damage = hero.attack + dice() - vilian.defense
+            damage = hero.attack_damage(text) + dice() - vilian.defense
             if damage <= 0:
                 text.append(f"Изловчившись он попадает по противнику, но тот остается невредим")
             else:

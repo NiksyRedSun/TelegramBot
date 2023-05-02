@@ -1,5 +1,13 @@
 import random
 
+def double_dices():
+    return random.randint(1, 6) + random.randint(1, 6)
+
+
+def dice():
+    return random.randint(1, 6)
+
+
 
 class Unit:
     def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
@@ -33,6 +41,9 @@ class Unit:
     def reset(self):
         self.alive = True
         self.hp = self.max_hp
+
+    def attack(self, villian, text: list):
+        pass
 
 
 
@@ -96,6 +107,24 @@ class Character(Unit):
             self.defense += 1
 
 
+    def attack_func(self, villian: Unit, text: list):
+        hero_init = double_dices() + self.initiative
+        villian_init = double_dices() + villian.initiative
+        if hero_init > villian_init:
+            damage = self.attack_damage(text) + dice() - villian.defense
+            if damage <= 0:
+                text.append(f"Изловчившись {self.name} попадает по противнику, но тот остается невредим")
+            else:
+                villian.hp -= damage
+                text.append(f"{self.name} наносит удар, который попадает прямо в цель, нанеся {damage} урона")
+                villian.check_alive()
+        else:
+            text.append(f"Однако его удар пролетает мимо врага")
+
+
+
+
+
 
 class Villian(Unit):
     def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
@@ -111,3 +140,18 @@ class Villian(Unit):
         pres_name = "+" + self.name.center(29, "-") + "+"
         text = [f"{pres_name}", f"Здоровье: {self.hp}/{self.max_hp}".center(27)]
         return '\n'.join(text)
+
+    def attack_func(self, hero: Unit, text: list):
+        hero_init = double_dices() + hero.initiative
+        villian_init = double_dices() + self.initiative
+        if villian_init > hero_init:
+            damage = self.attack_damage(text) + dice() - hero.defense
+            if damage <= 0:
+                text.append(f"Изловчившись {self.name} попадает по нашему герою, но тот остается невредим")
+            else:
+                hero.hp -= damage
+                text.append(f"{self.name} наносит удар, который попадает прямо в цель, нанеся {damage} урона")
+                hero.check_alive()
+        else:
+            text.append(f"Однако его удар пролетает мимо врага")
+

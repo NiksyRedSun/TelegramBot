@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from Functions import round, save_id, next, menu_keyboard
+from Functions import round, save_id, next, menu_keyboard, charChoosing
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict, testChar
 from SomeStates import GameState
 from EasyGameLoader import dp
@@ -47,7 +47,7 @@ async def bot_choice(message: types.Message):
 
 @dp.message_handler(state=GameState.charChoice)
 async def after_choice(message: types.Message, state: FSMContext):
-    players_dict[message.chat.id] = units_dict[message.text]
+    players_dict[message.chat.id] = charChoosing(message.text)
     await GameState.nameChoice.set()
     await message.answer(text="Придумайте себе имя, отправьте его сообщением")
 

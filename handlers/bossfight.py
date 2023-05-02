@@ -1,4 +1,6 @@
 import random
+import time
+
 import dotenv
 import os
 from aiogram import Bot, Dispatcher, types
@@ -19,7 +21,19 @@ from GameClasses import Unit, Villian
 from Functions import round, save_id, next, menu_keyboard, attack_menu, boss_end, boss_money_dealing, check_all_team_dead, boss_exp_dealing
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team, players_dict
 from SomeStates import GameState
-from EasyGameLoader import dp
+from EasyGameLoader import dp, bot
+from threading import Thread
+import time
+
+
+
+async def boss_attack():
+    while True:
+        await asyncio.sleep(0.5)
+        if current_boss_fight_team:
+            await bot.send_message(chat_id=current_boss_fight_team[0], text="Blyad")
+        await asyncio.sleep(0.5)
+    return None
 
 
 
@@ -29,6 +43,7 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
         if message.chat.id not in current_boss_fight_team:
             current_boss_fight_team.append(message.chat.id)
         await GameState.bossFight.set()
+        task = asyncio.create_task(boss_attack())
         await message.answer(text="Что же, в атаку", reply_markup=attack_menu())
     elif message.text == "Соскочить":
         await GameState.menuState.set()
@@ -45,8 +60,6 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
 async def boss_fight(message: types.Message, state: FSMContext):
     unit = players_dict[message.chat.id]
     text = round(unit, villian)
-    villian.check_alive()
-    unit.check_alive()
     await message.answer(text=text)
     if not unit.alive:
         await GameState.deadState.set()

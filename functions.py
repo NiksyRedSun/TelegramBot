@@ -1,7 +1,6 @@
 import random
-from GameClasses import Unit, Villian
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict
+from GameClasses import Character, Villian, Unit
 
 
 def double_dices():
@@ -12,36 +11,16 @@ def dice():
     return random.randint(1, 6)
 
 
-def round(hero: Unit, vilian: Unit):
+def round(hero: Character, villian: Villian):
     text = []
     hero_init = double_dices() + hero.initiative
-    villian_init = double_dices() + vilian.initiative
+    villian_init = double_dices() + villian.initiative
     if villian_init > hero_init:
-        text.append(f"В этом раунде перехватывает инициативу и атакует великий и ужасный {vilian.name}")
-        hero_init = double_dices() + hero.initiative
-        villian_init = double_dices() + vilian.initiative
-        if villian_init > hero_init:
-            damage = vilian.attack_damage(text) + dice() - hero.defense
-            if damage <= 0:
-                text.append(f"Его удар попадает прямо по нашему герою, но тот остается невредим")
-            else:
-                hero.hp -= damage
-                text.append(f"Его удар попадает прямо в цель, нанеся нашему герою {damage} урона")
-        else:
-            text.append(f"Однако его удар не попадает по цели, наш доблестный герой успевает увернуться")
+        text.append(f"В этом раунде перехватывает инициативу и атакует великий и ужасный {villian.name}")
+        villian.attack_func(hero, text)
     else:
         text.append(f"В этом раунде перехватывает инициативу и атакует наш доблестный герой, {hero.name}")
-        hero_init = double_dices() + hero.initiative
-        villian_init = double_dices() + vilian.initiative
-        if hero_init > villian_init:
-            damage = hero.attack_damage(text) + dice() - vilian.defense
-            if damage <= 0:
-                text.append(f"Изловчившись он попадает по противнику, но тот остается невредим")
-            else:
-                vilian.hp -= damage
-                text.append(f"Его точный удар попадает прямо в цель, нанеся противнику {damage} урона")
-        else:
-            text.append(f"Однако его удар пролетает мимо врага")
+        hero.attack_func(villian, text)
     return "\n".join(text)
 
 
@@ -122,3 +101,19 @@ async def boss_exp_dealing(players, enemy, message, players_dict):
         players_dict[i].next_level()
 
 
+def charChoosing(text):
+    match text:
+        case "/pirate":
+            return Character("Черная борода", "Как вы уже догадались, вы пират", 45, 5, 3, 4)
+        case "/tatarin":
+            return Character("Айзулбек", "Вы тут за татарина с луком", 25, 8, 3, 4)
+        case "/viking":
+            return Character("Сигурд", "Вы тут за викинга, вам ничего не остается кроме как махать мечом", 60, 10, 4, 2)
+        case "/elf":
+            return Character("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 1, 6)
+        case "/khajiit":
+            return Character("Рисаад", "Опция для тех, кто хочет играть за каджита", 30, 7, 1, 5)
+        case "/gnom":
+            return Character("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 8, 4, 3)
+        case "/testChar":
+            return Character("SomePers", "Используем этого перса для тестирования", 1, 1, 1, 1)

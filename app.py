@@ -17,10 +17,18 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
 from Functions import round, save_id
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team
 from SomeStates import GameState
-from EasyGameLoader import dp
+from EasyGameLoader import dp, bot
 import handlers
+import time
+from threading import Thread
+import asyncio
+
+
+
+
+
 
 
 if __name__ == '__main__':

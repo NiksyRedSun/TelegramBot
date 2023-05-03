@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from Functions import round, save_id
+from Functions import check_all_team_dead
 from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
@@ -29,8 +29,7 @@ import asyncio
 
 
 
-
-
 if __name__ == '__main__':
     print("Если ты видишь это сообщение, значит бот в игре")
     executor.start_polling(dp)
+

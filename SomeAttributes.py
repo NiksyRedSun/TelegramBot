@@ -1,6 +1,6 @@
-from GameClasses import Unit, Villian, Character
+from GameClasses import Character, DragonVillian
 
-villian = Villian("Красный дракон", "Его чешуя отливает бордово-винным цветом, но все почему-то говорят, что он красный", 230, 8, 4, 5)
+villian = DragonVillian()
 
 
 
@@ -17,7 +17,9 @@ ids = []
 units_dict = {"/pirate": pirate, "/tatarin": tatarin, "/viking": viking, "/elf": elf, "/khajiit": khajiit,
               "/gnom": gnom, "/testChar": testChar}
 
+boss_fight_is_on = False
+
 players_dict = {}
 
-current_boss_fight_team = []
+current_boss_fight_team = {}
 

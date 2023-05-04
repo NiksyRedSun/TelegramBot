@@ -31,6 +31,19 @@ async def bot_start(message: types.Message):
                               f"Нажмите на старт, чтобы начать", reply_markup=menu)
     players_dict[message.chat.id] = None
 
+@dp.message_handler(Command("restart"), state=None)
+async def bot_choice(message: types.Message):
+    await message.answer(text="Выберите персонажа:\n"
+                              "/pirate - пират\n"
+                              "/tatarin - татарин\n"
+                              "/viking - викинг\n"
+                              "/elf - эльф\n"
+                              "/khajiit - каджит\n"
+                              "/gnom - гном\n"
+                              "/testChar - под тест\n")
+    await GameState.charChoice.set()
+
+
 
 @dp.message_handler(Text("Старт"), state=None)
 async def bot_choice(message: types.Message):
@@ -58,7 +71,7 @@ async def after_choice(message: types.Message, state: FSMContext):
     text = players_dict[message.chat.id].presentation()
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="В меню")]], resize_keyboard=True)
-    await message.answer(text=text, reply_markup=menu)
+    await message.answer(text=text, reply_markup=menu, parse_mode="HTML")
     await GameState.menuState.set()
 
 
@@ -67,10 +80,9 @@ async def before_fight(message: types.Message, state: FSMContext):
     if message.text == "Бой с боссом":
         await GameState.preBossFight.set()
         await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next())
-        await message.answer(text=villian.presentation(), reply_markup=next())
     elif message.text == "Персонаж":
         text = players_dict[message.chat.id].presentation()
-        await message.answer(text=text)
+        await message.answer(text=text, parse_mode="HTML")
     elif message.text in ["Бой с мобом", "Магазин", "Инвентарь"]:
         await message.answer(text=f"Функционал в разработке")
     else:

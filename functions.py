@@ -1,6 +1,6 @@
 import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from GameClasses import Character, Villian
+from GameClasses import Character, Villian, SpiderVillian, DragonVillian, GolemVillian, TreeVillian
 
 
 def double_dices():
@@ -53,7 +53,7 @@ def check_all_team_dead(players: dict):
 
 def boss_end(players: dict):
     text = []
-    text.append("+" + "Результаты".center(56, "-") + "+")
+    text.append("<code>+" + "Результаты".center(30, "-") + "+</code>")
     text.append("Имена наших героев:")
     for id in players:
         text.append(players[id].name)
@@ -101,3 +101,6 @@ async def fight_presentantion(char, enemy, message):
     # line += "<code>" + "=" * 31 + "</code>" + "\n"
     line += enemy.fight_presentation()
     await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
+
+def give_villian():
+    return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian()])

@@ -1,6 +1,6 @@
 import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from GameClasses import Character
+from GameClasses import Character, Villian
 
 
 def double_dices():
@@ -53,23 +53,11 @@ def check_all_team_dead(players: dict):
 
 def boss_end(players: dict):
     text = []
-    if all(map(lambda x: players[x].alive, players)):
-        text.append("+" + "Результаты".center(56, "-") + "+")
-        text.append("Вам повезло, все остались в живых")
-        text.append("Имена наших героев:")
-        for id in players:
-            text.append(players[id].name)
-        return "\n".join(text)
-    else:
-        text.append("+" + "Результаты".center(56, "-") + "+")
-        text.append("Битва закончена, жаль не все её пережили")
-        sorted_dict = dict(sorted(players.items(), key=lambda item: item[1].alive))
-        for id in sorted_dict:
-            if players[id].alive:
-                text.append(f"{players[id].name} - Вывез")
-            else:
-                text.append(f"{players[id].name} - Не вывез")
-        return "\n".join(text)
+    text.append("+" + "Результаты".center(56, "-") + "+")
+    text.append("Имена наших героев:")
+    for id in players:
+        text.append(players[id].name)
+    return "\n".join(text)
 
 
 async def boss_money_dealing(players: dict, enemy, message):
@@ -104,3 +92,12 @@ def charChoosing(text):
             return Character("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 8, 4, 3)
         case "/testChar":
             return Character("SomePers", "Используем этого перса для тестирования", 1000, 1000, 1000, 1000)
+
+
+async def fight_presentantion(char, enemy, message):
+    line = ""
+    line += char.fight_presentation() + "\n"
+    line += "\n" * 2
+    # line += "<code>" + "=" * 31 + "</code>" + "\n"
+    line += enemy.fight_presentation()
+    await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")

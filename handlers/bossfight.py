@@ -18,8 +18,8 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
-from Functions import save_id, next, menu_keyboard, attack_menu, boss_end, boss_money_dealing, check_all_team_dead, boss_exp_dealing
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team, players_dict, boss_fight_is_on
+from Functions import save_id, next, menu_keyboard, attack_menu, boss_end, boss_money_dealing, check_all_team_dead, boss_exp_dealing, fight_presentantion
+from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
 from threading import Thread
@@ -35,13 +35,14 @@ async def boss_attack():
 
 
 
-
 @dp.message_handler(state=GameState.preBossFight)
 async def pre_boss_fight(message: types.Message, state: FSMContext):
     global boss_fight_is_on
     if message.text == "Начать бой с боссом":
         if message.chat.id not in current_boss_fight_team:
             current_boss_fight_team[message.chat.id] = players_dict[message.chat.id]
+        if message.chat.id not in boss_fight_team:
+            boss_fight_team[message.chat.id] = players_dict[message.chat.id]
         if not boss_fight_is_on:
             boss_fight_is_on = True
             task = asyncio.create_task(boss_attack())
@@ -62,34 +63,32 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
 async def boss_fight(message: types.Message, state: FSMContext):
     global boss_fight_is_on
     unit = players_dict[message.chat.id]
-    if not unit.alive:
-        await GameState.deadState.set()
-        await message.answer(text=villian.fight_presentation())
-        await message.answer(text=unit.fight_presentation())
-        await message.answer(text="Вы теперь мертв, результаты боя можете узнать у своей команды", reply_markup=next())
-        return None
-    if not villian.alive:
-        await message.answer(text="Ваш противник повержен")
-        await message.answer(text=boss_end(current_boss_fight_team), reply_markup=next())
-        await GameState.menuState.set()
-        await boss_money_dealing(current_boss_fight_team, villian, message)
-        await boss_exp_dealing(current_boss_fight_team, villian, message)
+    if check_all_team_dead(current_boss_fight_team):
+        await message.answer(text="Вся команда нападавших мертва", reply_markup=next())
         current_boss_fight_team.clear()
+        boss_fight_team.clear()
         villian.reset()
         boss_fight_is_on = False
+        await GameState.deadState.set()
         return None
-    if check_all_team_dead(current_boss_fight_team):
-        await message.answer(text="Вся команда нападавших мертва")
+    if not unit.alive:
+        await GameState.deadState.set()
+        await fight_presentantion(unit, villian, message)
+        await message.answer(text="Вы мертв", reply_markup=next())
+        del current_boss_fight_team[message.chat.id]
+        return None
+    if not villian.alive:
+        await message.answer(text="Ваш противник мертв")
+        await message.answer(text=boss_end(boss_fight_team), reply_markup=next())
+        await GameState.menuState.set()
+        await boss_money_dealing(boss_fight_team, villian, message)
+        await boss_exp_dealing(boss_fight_team, villian, message)
         current_boss_fight_team.clear()
         villian.reset()
         boss_fight_is_on = False
         return None
     await unit.attack_func(villian, message)
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Атаковать")]], resize_keyboard=True)
-    await message.answer(text=villian.fight_presentation())
-    await message.answer(text=unit.fight_presentation(), reply_markup=menu)
-    # await message.answer(text=f"{players_dict}, {current_boss_fight_team}")
+    await fight_presentantion(unit, villian, message)
 
 
 

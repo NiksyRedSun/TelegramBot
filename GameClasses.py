@@ -79,11 +79,11 @@ class Character(Unit):
     def fight_presentation(self):
         pres_name = "+" + self.name.center(29, "-") + "+"
         text = [
-                f"{pres_name}",
-                f"Здоровье: {self.hp}/{self.max_hp}".center(27),
-                f"Атака: {self.attack}",
-                f"Защита: {self.defense}",
-                f"Инициатива: {self.initiative}"]
+                f"<code>{pres_name}</code>",
+                f"Здоровье: {self.hp}/{self.max_hp}".center(54)]
+                # f"Атака: {self.attack}",
+                # f"Защита: {self.defense}",
+                # f"Инициатива: {self.initiative}"]
         return '\n'.join(text)
 
 
@@ -99,8 +99,9 @@ class Character(Unit):
 
 
     async def attack_func(self, villian: Unit, message):
-        await message.answer(text = f"{self.name} замахивается на противника")
-        await asyncio.sleep(0.5)
+        text = []
+        await message.answer(text=f"{self.name} замахивается на противника")
+        await asyncio.sleep(0.7)
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init > villian_init:
@@ -109,38 +110,33 @@ class Character(Unit):
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
                 hit_damage = self.attack * 2
-                await message.answer(text=f"*<b>КРИТИЧЕСКИЙ УДАР</b>*", parse_mode="HTML")
+                text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
             else:
                 hit_damage = self.attack
 
 
             damage = hit_damage + dice() - villian.defense
             if damage <= 0:
-                await message.answer(text=f"Изловчившись {self.name} попадает по противнику, но тот остается невредим")
+                text.append(f"Изловчившись {self.name} попадает по противнику, но тот остается невредим")
             else:
                 villian.hp -= damage
-                await message.answer(text=f"{self.name} наносит удар, который попадает прямо в цель, нанеся {damage} урона")
+                text.append(f"{self.name} наносит удар, который попадает прямо в цель, нанеся {damage} урона")
                 villian.check_alive()
-
         else:
-            await message.answer(text=f"Однако его удар пролетает мимо врага")
+            text.append(f"{self.name} промахивается")
+        await message.answer(text="\n".join(text), parse_mode="HTML")
 
 
 
 
 class Villian(Unit):
-    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
-        super().__init__(s_name, s_story, s_hp, s_attack, s_defense, s_initiative)
-        self.money = 250
-        self.exp = 1000
-
     def presentation(self):
         text = [f"Ваш противник: {self.name}", f"{self.story}"]
         return '\n'.join(text)
 
     def fight_presentation(self):
         pres_name = "+" + self.name.center(29, "-") + "+"
-        text = [f"{pres_name}", f"Здоровье: {self.hp}/{self.max_hp}".center(27)]
+        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(54)]
         return '\n'.join(text)
 
 
@@ -158,35 +154,27 @@ class DragonVillian(Villian):
         self.exp = 1000
 
 
-    async def attack_one_func(self, players: dict, char, bot, quouteIndex):
+
+    def attack_one_func(self, char, quouteIndex, text: list):
         if char.alive:
-            pos_quotes = [f"{char.name} успевает уклониться от хвоста", f"{char.name} успевает уклониться от столба пламени",
-                            f"{char.name} вовремя закрывает уши", f"{char.name} избегает действия порыва ветра"]
+            pos_quotes = [f"{char.name} успевает уклониться от хвоста Красного дракона", f"{char.name} успевает уклониться от столба пламени Красного дракона",
+                            f"{char.name} вовремя закрывает уши и не слышит рева Красного дракона", f"{char.name} избегает действия порыва ветра созданного Красным драконом"]
             villian_init = double_dices() + self.initiative
             char_init = double_dices() + char.initiative
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
-                # if critical_hit:
-                #     neg_quotes = [f"{char.name} подлетает вверх на 5 метров, а потом получает {damage} урона от падения",
-                #                   f"{char.name} получает {damage} единиц урона от горения, задержавшись в пламени на две секунды",
-                #                   f"{char.name} роняет барабанные перепонки и теряет {damage} hp",
-                #                   f"{char.name} теряет равновесие, и оказавшись в когтях дракона теряет {damage} hp"]
-
                 neg_quotes = [f"{char.name} получает {damage} урона от удара хвостом",
                               f"{char.name} получает {damage} единиц урона от ожогов, задержавшись в пламени на пол секунды",
                               f"{char.name} теряет кровь из ушей и {damage} hp",
-                              f"{char.name} отлетает от дракона и теряет {damage} hp"]
+                              f"От порыва ветра {char.name} падает в цепкие лапы Дракона теряя {damage} hp"]
                 if damage <= 0:
-                    for player in players:
-                        await bot.send_message(chat_id=player, text=pos_quotes[quouteIndex])
+                    text.append(pos_quotes[quouteIndex])
                 else:
                     char.hp -= damage
                     char.check_alive()
-                    for player in players:
-                        await bot.send_message(chat_id=player, text=neg_quotes[quouteIndex])
+                    text.append(neg_quotes[quouteIndex])
             else:
-                for player in players:
-                    await bot.send_message(chat_id=player, text=pos_quotes[quouteIndex])
+                text.append(pos_quotes[quouteIndex])
 
 
 
@@ -196,8 +184,12 @@ class DragonVillian(Villian):
         quotes = [f"{self.name} замахивается своим хвостом", f"{self.name} готовится залить все огнем",
                   f"{self.name} издает пронзительный рев", f"{self.name} хлопает крыльями"]
         for player in players:
-            text = random.choice(quotes)
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(2)
+        message_text = []
         for player in players:
-            await self.attack_one_func(players, players[player], bot, quoteIndex)
+            self.attack_one_func(players[player], quoteIndex, message_text)
+            message_text.append("\n")
+        for player in players:
+            await bot.send_message(chat_id=player, text="\n".join(message_text))
+

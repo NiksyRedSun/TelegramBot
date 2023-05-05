@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
 from Functions import save_id, next, menu_keyboard, charChoosing
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict, testChar, current_boss_fight_team
+from SomeAttributes import villian, players_dict, current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp
 
@@ -30,6 +30,7 @@ async def bot_start(message: types.Message):
     await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"
                               f"Нажмите на старт, чтобы начать", reply_markup=menu)
     players_dict[message.chat.id] = None
+
 
 @dp.message_handler(Command("restart"), state=None)
 async def bot_choice(message: types.Message):
@@ -77,12 +78,17 @@ async def after_choice(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=GameState.menuState)
 async def before_fight(message: types.Message, state: FSMContext):
+    char = players_dict[message.chat.id]
+    if not char.alive:
+        await GameState.deadState.set()
+        return None
     if message.text == "Бой с боссом":
         await GameState.preBossFight.set()
         await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next())
+    elif message.text == "Фонтан":
+        await char.fountain_healing(random.randint(1, 6), message)
     elif message.text == "Персонаж":
-        text = players_dict[message.chat.id].presentation()
-        await message.answer(text=text, parse_mode="HTML")
+        await message.answer(text=char.presentation(), parse_mode="HTML")
     elif message.text in ["Бой с мобом", "Магазин", "Инвентарь"]:
         await message.answer(text=f"Функционал в разработке")
     else:

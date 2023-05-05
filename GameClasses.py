@@ -69,7 +69,7 @@ class Character(Unit):
         if self.alive:
             return '\n'.join(text)
         else:
-            pres_name = "+" + ("Дух " + self.name).center(56, "-") + "+"
+            pres_name = "<code>+" + ("Дух " + self.name).center(30, "-") + "+</code>"
             text = [str_to_deathstr(text[i]) if i != 2 else text[i] for i in range(len(text))]
             text[0] = pres_name
             return '\n'.join(text)
@@ -89,7 +89,7 @@ class Character(Unit):
 
     def next_level(self):
         while self.exp > self.next_level_exp:
-            self.next_level_exp = int(self.next_level_exp * 1.5)
+            self.next_level_exp = int(100 * 2 ** self.next_level_exp)
             self.level += 1
             if self.level % 2 == 0:
                 self.max_hp += 3
@@ -99,8 +99,6 @@ class Character(Unit):
             if self.level % 4 == 0:
                 self.initiative += 1
             self.hp = self.max_hp
-
-
 
 
     async def attack_func(self, villian: Unit, message):
@@ -136,14 +134,27 @@ class Character(Unit):
         await message.answer(text="\n".join(text), parse_mode="HTML")
 
 
-    def ressurect(self):
+    def ressurecting(self):
         self.hp = int(self.max_hp * random.random())
         self.alive = True
 
 
+    async def fountain_healing(self, heal_hp, message):
+        if heal_hp + self.hp < self.max_hp:
+            self.hp += heal_hp
+            await message.answer(text=f"Живительная влага восстановила вам {heal_hp} hp")
+        else:
+            self.hp = self.max_hp
+            await message.answer(text=f"Фонтан залечил каждую рану на вашем теле")
+
 
 
 class Villian(Unit):
+    def __init__(self):
+        self.money = None
+        self.exp = None
+
+
     def presentation(self):
         text = [f"Ваш противник: {self.name}", f"{self.story}"]
         return '\n'.join(text)
@@ -156,7 +167,19 @@ class Villian(Unit):
     def reset(self):
         self.__init__()
 
+    async def boss_money_dealing(self, players: dict, message):
+        cur_money = int(self.money / len(players))
+        for i in players:
+            players[i].money += cur_money
+        await message.answer(text=f"Каждый из участников битвы получил по {cur_money} монет")
 
+    async def boss_exp_dealing(self, players: dict, message):
+        cur_exp = int(self.exp / len(players))
+        for i in players:
+            players[i].exp += cur_exp
+        await message.answer(text=f"Каждый из участников битвы получил по {cur_exp} опыта")
+        for i in players:
+            players[i].next_level()
 
 
 class DragonVillian(Villian):
@@ -194,8 +217,10 @@ class DragonVillian(Villian):
                     text.append(pos_quotes[quouteIndex])
                 else:
                     char.hp -= damage
-                    char.check_alive()
                     text.append(neg_quotes[quouteIndex])
+                    char.check_alive()
+                    if not char.alive:
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
             else:
                 text.append(pos_quotes[quouteIndex])
 
@@ -252,8 +277,10 @@ class SpiderVillian(Villian):
                     text.append(pos_quotes[quouteIndex])
                 else:
                     char.hp -= damage
-                    char.check_alive()
                     text.append(neg_quotes[quouteIndex])
+                    char.check_alive()
+                    if not char.alive:
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
             else:
                 text.append(pos_quotes[quouteIndex])
 
@@ -307,8 +334,10 @@ class GolemVillian(Villian):
                     text.append(pos_quotes[quouteIndex])
                 else:
                     char.hp -= damage
-                    char.check_alive()
                     text.append(neg_quotes[quouteIndex])
+                    char.check_alive()
+                    if not char.alive:
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
             else:
                 text.append(pos_quotes[quouteIndex])
 
@@ -363,8 +392,10 @@ class TreeVillian(Villian):
                     text.append(pos_quotes[quouteIndex])
                 else:
                     char.hp -= damage
-                    char.check_alive()
                     text.append(neg_quotes[quouteIndex])
+                    char.check_alive()
+                    if not char.alive:
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
             else:
                 text.append(pos_quotes[quouteIndex])
 

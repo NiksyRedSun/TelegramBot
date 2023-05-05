@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian, Character
 from Functions import save_id, next, menu_keyboard, death_menu
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, players_dict
+from SomeAttributes import villian, players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp
 
@@ -25,10 +25,11 @@ from EasyGameLoader import dp
 
 @dp.message_handler(state=GameState.deadState)
 async def after_choice(message: types.Message, state: FSMContext):
-    unit = players_dict[message.chat.id]
+    char = players_dict[message.chat.id]
     if message.text == "Вернуться":
-        unit.ressurect()
+        await message.answer(text="Вас восстанавливает", reply_markup=menu_keyboard())
         await GameState.menuState.set()
+        char.ressurecting()
     elif message.text == "Персонаж":
         text = players_dict[message.chat.id].presentation()
         await message.answer(text=text, parse_mode="HTML")

@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from GameClasses import Unit, Villian
 from Functions import check_all_team_dead
-from SomeAttributes import villian, pirate, tatarin, viking, elf, khajiit, gnom, ids, units_dict, current_boss_fight_team
+from SomeAttributes import villian, current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
 import handlers

@@ -25,7 +25,8 @@ def next():
 def menu_keyboard():
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
-                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
+                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")], [KeyboardButton(text="Персонаж")],
+                  [KeyboardButton(text="Фонтан")]], resize_keyboard=True)
     return menu
 
 
@@ -39,8 +40,6 @@ def death_menu():
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Вернуться")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
     return menu
-
-
 
 
 
@@ -60,21 +59,6 @@ def boss_end(players: dict):
     return "\n".join(text)
 
 
-async def boss_money_dealing(players: dict, enemy, message):
-    cur_money = int(enemy.money/len(players))
-    for i in players:
-        players[i].money += cur_money
-    await message.answer(text=f"Каждый из участников битвы получил по {cur_money} монет")
-
-
-async def boss_exp_dealing(players:dict, enemy, message):
-    cur_exp = int(enemy.exp/len(players))
-    for i in players:
-        players[i].exp += cur_exp
-    await message.answer(text=f"Каждый из участников битвы получил по {cur_exp} опыта")
-    for i in players:
-        players[i].next_level()
-
 
 def charChoosing(text):
     match text:
@@ -91,7 +75,7 @@ def charChoosing(text):
         case "/gnom":
             return Character("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 8, 4, 3)
         case "/testChar":
-            return Character("SomePers", "Используем этого перса для тестирования", 1000, 1000, 1000, 1000)
+            return Character("SomePers", "Используем этого перса для тестирования", 50, 1, 1, 1)
 
 
 async def fight_presentantion(char, enemy, message):

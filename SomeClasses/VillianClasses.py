@@ -40,6 +40,7 @@ class Villian(Unit):
         for player in players:
             players[player].money += cur_money
             players[player].exp += cur_exp
+            players[player].next_level()
             await bot.send_message(chat_id=player,
                                    text='\n'.join(text),
                                    parse_mode="HTML",
@@ -100,7 +101,7 @@ class DragonVillian(Villian):
                   f"{self.name} издает пронзительный рев",
                   f"{self.name} хлопает крыльями",
                   f"{self.name} взлетел и приготовил когти для атаки"]
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
 
@@ -111,14 +112,14 @@ class DragonVillian(Villian):
                       f"Теперь {self.name} уж точно никогда не будет рычать",
                       f"{self.name} схлапывается сам",
                       f"{self.name} упал, вытянув ноги"]
-            for player in players:
+            for player in players.copy():
                 await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
             return None
 
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
 
@@ -169,7 +170,7 @@ class SpiderVillian(Villian):
                   f"{self.name} плюется кислотой",
                   f"{self.name} замахивается передними лапами",
                   f"{self.name} готовится пустить в ход жвалы"]
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
 
@@ -179,14 +180,14 @@ class SpiderVillian(Villian):
                       f"{self.name} больше никогда не будет плевать кислотой",
                       f"Теперь {self.name} склеил лапы",
                       f"{self.name} подавился собственными жвалами"]
-            for player in players:
+            for player in players.copy():
                 await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
             return None
 
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
 
@@ -237,7 +238,7 @@ class GolemVillian(Villian):
                   f"{self.name} пускает в ход кипящее масло",
                   f"{self.name} готовится выстрелить стальными колышками",
                   f"{self.name} разгоняется для удара"]
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
 
@@ -247,14 +248,14 @@ class GolemVillian(Villian):
                       f"{self.name} теряет свое кипящее масло",
                       f"Это были последние колышки, которыми он планировал выстрелить",
                       f"{self.name} падает на бегу"]
-            for player in players:
+            for player in players.copy():
                 await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
             return None
 
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
 
@@ -306,7 +307,7 @@ class TreeVillian(Villian):
                   f"{self.name} пускает в ход свои корни",
                   f"{self.name} роняет гнилые плоды",
                   f"{self.name} приподнимает свои листья, раскрывая крону"]
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
 
@@ -316,14 +317,14 @@ class TreeVillian(Villian):
                       f"{self.name} переворачивается корнями вверх",
                       f"{self.name} тонет в собственной гнили",
                       f"{self.name} перераскрыло свой потенциал"]
-            for player in players:
+            for player in players.copy():
                 await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
             return None
 
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
-        for player in players:
+        for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
 

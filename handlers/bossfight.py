@@ -26,15 +26,32 @@ from threading import Thread
 import time
 
 
+async def boss_check_team():
+    while True:
+
+        team_state = check_all_team(current_boss_fight_team)
+        if team_state == "Left":
+            boss_fight_reset()
+            break
+
+        elif team_state == "Dead":
+            for player in current_boss_fight_team.copy():
+                await bot.send_message(chat_id=player, text="<b>Вся команда отъехала</b>", parse_mode="HTML")
+            boss_fight_reset()
+            break
+
+        await asyncio.sleep(0.1)
+
+
 async def boss_check():
-    global boss_fight_is_over, boss_fight_is_on
+    global boss_fight_is_over
     while True:
         if not villian.alive:
             await villian.boss_money_exp_dealing(boss_fight_team, bot)
             boss_fight_team.clear()
             boss_fight_is_over = True
             break
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
 
 
 
@@ -65,6 +82,7 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
             boss_fight_is_on = True
             task1 = asyncio.create_task(boss_attack())
             task2 = asyncio.create_task(boss_check())
+            task3 = asyncio.create_task(boss_check_team())
         if message.chat.id not in current_boss_fight_team:
             current_boss_fight_team[message.chat.id] = players_dict[message.chat.id]
         if message.chat.id not in boss_fight_team:
@@ -114,20 +132,13 @@ async def boss_fight(message: types.Message, state: FSMContext):
                 await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=menu_keyboard())
 
         elif message.text == "Закончить":
-            current_boss_fight_team.pop(message.chat.id, None)
-            await GameState.menuState.set()
-            await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
+            if boss_fight_is_over:
+                current_boss_fight_team.pop(message.chat.id, None)
+                await GameState.menuState.set()
+                await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
+
         else:
             pass
-
-    team_state = check_all_team(current_boss_fight_team)
-    if team_state == "Left":
-        boss_fight_reset()
-
-    elif team_state == "Dead":
-        await message.answer(text="Вся команда нападавших мертва", reply_markup=next())
-        boss_fight_reset()
-        await GameState.deadState.set()
 
 
 

@@ -71,7 +71,7 @@ def charChoosing(text):
         case "/gnom":
             return Character("Эдукан", "Никакой команде не обойтись без\n гнома, на вас - размахивать\n топором", 50, 8, 4, 3)
         case "/testChar":
-            return Character("SomePers", "Используем этого перса для тестирования", 1000, 100, 1000, 1000)
+            return Character("SomePers", "Используем этого перса для тестирования", 1, 1, 1, 1)
 
 
 async def fight_presentantion(char, enemy, message):

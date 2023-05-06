@@ -23,14 +23,25 @@ class Villian(Unit):
     def reset(self):
         self.__init__()
 
-    async def boss_money_exp_dealing(self, players: dict, message):
+    async def boss_money_exp_dealing(self, players: dict, bot):
         cur_money = int(self.money / len(players))
         cur_exp = int(self.exp / len(players))
-        for i in players:
-            players[i].money += cur_money
-            players[i].exp += cur_exp
-        text = [f"Каждый из участников битвы получил по {cur_money} монет", f"Каждый из участников битвы получил по {cur_exp} опыта"]
-        await message.answer(text='\n'.join((text)))
+        text = [f"Рейд-босс мертв",
+                "<code>+" + "Результаты".center(30, "-") + "+</code>",
+                "Имена наших героев:"]
+
+        for id in players:
+            text.append(players[id].name)
+
+        text.append([
+            f"Каждый из участников битвы получил по {cur_money} монет",
+            f"Каждый из участников битвы получил по {cur_exp} опыта"])
+
+        for player in players:
+            players[player].money += cur_money
+            players[player].exp += cur_exp
+            await bot.send_message(chat_id=player, text='\n'.join(text), parse_mode="HTML")
+
 
 
 
@@ -89,6 +100,18 @@ class DragonVillian(Villian):
         for player in players:
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
+
+        self.check_alive()
+        if not self.alive:
+            quotes = [f"Это был последний взмах хвоста Красного дракона",
+                      f"{self.name} больше никого не зальет огнем",
+                      f"Теперь {self.name} уж точно никогда не будет рычать",
+                      f"{self.name} схлапывается сам",
+                      f"{self.name} упал, вытянув ноги"]
+            for player in players:
+                await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
+            return None
+
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
@@ -146,6 +169,17 @@ class SpiderVillian(Villian):
         for player in players:
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
+
+        self.check_alive()
+        if not self.alive:
+            quotes = [f"{self.name} упал замертво",
+                      f"{self.name} больше никогда не будет плевать кислотой",
+                      f"Теперь {self.name} склеил лапы",
+                      f"{self.name} подавился собственными жвалами"]
+            for player in players:
+                await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
+            return None
+
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
@@ -203,6 +237,17 @@ class GolemVillian(Villian):
         for player in players:
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
+
+        self.check_alive()
+        if not self.alive:
+            quotes = [f"{self.name} теряет равновесие и разливает масло",
+                      f"{self.name} теряет свое кипящее масло",
+                      f"Это были последние колышки, которыми он планировал выстрелить",
+                      f"{self.name} падает на бегу"]
+            for player in players:
+                await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
+            return None
+
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)
@@ -257,10 +302,21 @@ class TreeVillian(Villian):
         quotes = [f"{self.name} замахивается ветками",
                   f"{self.name} пускает в ход свои корни",
                   f"{self.name} роняет гнилые плоды",
-                  f"{self.name} приподнимает свои листья"]
+                  f"{self.name} приподнимает свои листья, раскрывая крону"]
         for player in players:
             await bot.send_message(chat_id=player, text=quotes[quoteIndex])
         await asyncio.sleep(2)
+
+        self.check_alive()
+        if not self.alive:
+            quotes = [f"{self.name} роняет ветки",
+                      f"{self.name} переворачивается корнями вверх",
+                      f"{self.name} тонет в собственной гнили",
+                      f"{self.name} перераскрыло свой потенциал"]
+            for player in players:
+                await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
+            return None
+
         message_text = []
         for player in players:
             self.attack_one_func(players[player], quoteIndex, message_text)

@@ -74,10 +74,22 @@ class Character(Unit):
         text = []
         await message.answer(text=f"{self.name} замахивается на противника")
         await asyncio.sleep(0.7)
+
+        self.check_alive()
+        villian.check_alive()
+        if not self.alive:
+            text.append(f"{self.name} роняет свое оружие захлебываясь кровью")
+            await message.answer(text="\n".join(text), parse_mode="HTML")
+            return None
+
+        if not villian.alive:
+            text.append(f"{self.name} опускает свой мечь, опомнившись от ярости")
+            await message.answer(text="\n".join(text), parse_mode="HTML")
+            return None
+
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init > villian_init:
-
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):

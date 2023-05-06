@@ -5,6 +5,7 @@ villian = give_villian()
 
 
 boss_fight_is_on = False
+boss_fight_is_over = False
 
 
 players_dict = {}

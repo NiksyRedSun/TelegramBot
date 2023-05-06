@@ -41,20 +41,13 @@ def death_menu():
 
 
 
-def check_all_team_dead(players: dict):
+def check_all_team(players: dict):
+    if len(players) == 0:
+        return "Left"
     if all(map(lambda x: not players[x].alive, players)):
-        return True
+        return "Dead"
     else:
-        return False
-
-
-def boss_end(players: dict):
-    text = []
-    text.append("<code>+" + "Результаты".center(30, "-") + "+</code>")
-    text.append("Имена наших героев:")
-    for id in players:
-        text.append(players[id].name)
-    return "\n".join(text)
+        return "Alive"
 
 
 
@@ -73,7 +66,7 @@ def charChoosing(text):
         case "/gnom":
             return Character("Эдукан", "Никакой команде не обойтись без\n гнома, на вас - размахивать\n топором", 50, 8, 4, 3)
         case "/testChar":
-            return Character("SomePers", "Используем этого перса для тестирования", 50, 1, 1, 1)
+            return Character("SomePers", "Используем этого перса для тестирования", 1000, 100, 1000, 1000)
 
 
 async def fight_presentantion(char, enemy, message):

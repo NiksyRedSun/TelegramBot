@@ -2,6 +2,7 @@ import random
 import asyncio
 from EasyGameLoader import bot
 from SomeClasses.BasicClasses import Unit, dice, double_dices
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 
 
 
@@ -26,21 +27,23 @@ class Villian(Unit):
     async def boss_money_exp_dealing(self, players: dict, bot):
         cur_money = int(self.money / len(players))
         cur_exp = int(self.exp / len(players))
-        text = [f"Рейд-босс мертв",
-                "<code>+" + "Результаты".center(30, "-") + "+</code>",
+        text = [ "<code>+" + "Результаты".center(32, "-") + "+</code>",
+                "<b><code>" + "Рейд-босс мертв".center(34, " ") + "</code></b>",
                 "Имена наших героев:"]
 
         for id in players:
             text.append(players[id].name)
 
-        text.append([
-            f"Каждый из участников битвы получил по {cur_money} монет",
-            f"Каждый из участников битвы получил по {cur_exp} опыта"])
+        text.append(f"Каждый из участников битвы получил по {cur_money} монет")
+        text.append(f"Каждый из участников битвы получил по {cur_exp} опыта")
 
         for player in players:
             players[player].money += cur_money
             players[player].exp += cur_exp
-            await bot.send_message(chat_id=player, text='\n'.join(text), parse_mode="HTML")
+            await bot.send_message(chat_id=player,
+                                   text='\n'.join(text),
+                                   parse_mode="HTML",
+                                   reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True))
 
 
 

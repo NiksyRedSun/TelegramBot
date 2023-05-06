@@ -2,6 +2,7 @@ from SomeClasses.BasicClasses import Unit, dice, double_dices
 import random
 import asyncio
 from EasyGameLoader import bot
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 
 
 
@@ -72,19 +73,19 @@ class Character(Unit):
     async def attack_func(self, villian: Unit, message):
         critical_hit = False
         text = []
-        await message.answer(text=f"{self.name} замахивается на противника")
+        await message.answer(text=f"Вы замахиваетесь на противника")
         await asyncio.sleep(0.7)
 
         self.check_alive()
         villian.check_alive()
         if not self.alive:
-            text.append(f"{self.name} роняет свое оружие захлебываясь кровью")
+            text.append(f"Вы роняете свое оружие захлебываясь кровью")
             await message.answer(text="\n".join(text), parse_mode="HTML")
             return None
 
         if not villian.alive:
-            text.append(f"{self.name} опускает свой мечь, опомнившись от ярости")
-            await message.answer(text="\n".join(text), parse_mode="HTML")
+            text.append(f"Вы опускаете свой мечь, опомнившись от ярости")
+            await message.answer(text="\n".join(text), parse_mode="HTML", reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True))
             return None
 
         hero_init = double_dices() + self.initiative
@@ -102,15 +103,15 @@ class Character(Unit):
 
             damage = hit_damage + dice() - villian.defense
             if damage <= 0:
-                text.append(f"Изловчившись {self.name} попадает по противнику, но тот остается невредим")
+                text.append(f"Изловчившись вы попадаете по противнику, но тот остается невредим")
             else:
                 villian.hp -= damage
-                text.append(f"{self.name} наносит удар прямо в цель, противник теряет {damage} hp")
+                text.append(f"Вы наносите удар прямо в цель, противник теряет {damage} hp")
                 if critical_hit:
                     text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
                 villian.check_alive()
         else:
-            text.append(f"{self.name} промахивается")
+            text.append(f"Вы промахиваетесь")
         await message.answer(text="\n".join(text), parse_mode="HTML")
 
 

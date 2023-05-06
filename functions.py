@@ -33,6 +33,11 @@ def attack_menu():
         keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True)
     return menu
 
+def end_menu():
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True)
+    return menu
+
 
 def death_menu():
     menu = ReplyKeyboardMarkup(
@@ -75,7 +80,10 @@ async def fight_presentantion(char, enemy, message):
     line += "\n" * 2
     # line += "<code>" + "=" * 31 + "</code>" + "\n"
     line += enemy.fight_presentation()
-    await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
+    if enemy.alive:
+        await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
+    else:
+        await message.answer(text=line, reply_markup=end_menu(), parse_mode="HTML")
 
 def give_villian():
     return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian()])

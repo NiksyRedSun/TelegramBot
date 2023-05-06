@@ -26,6 +26,17 @@ from threading import Thread
 import time
 
 
+async def boss_check():
+    global boss_fight_is_over, boss_fight_is_on
+    while True:
+        if not villian.alive:
+            await villian.boss_money_exp_dealing(boss_fight_team, bot)
+            boss_fight_team.clear()
+            boss_fight_is_over = True
+            break
+        await asyncio.sleep(0.5)
+
+
 
 def boss_fight_reset():
     global villian, boss_fight_is_over, boss_fight_is_on
@@ -39,32 +50,10 @@ def boss_fight_reset():
 
 async def boss_attack():
     global boss_fight_is_over
-    while True:
-        if not villian.alive:
-            await villian.boss_money_exp_dealing(boss_fight_team, bot)
-            boss_fight_is_over = True
-            break
-
-        team_state = check_all_team(current_boss_fight_team)
-        if team_state in ["Left", "Dead"]:
-            break
-        if not boss_fight_is_on:
-            break
-
+    while not boss_fight_is_over:
         await villian.attack_func(current_boss_fight_team, bot)
-        await asyncio.sleep(2)
+        await asyncio.sleep(4)
 
-        if not villian.alive:
-            await villian.boss_money_exp_dealing(boss_fight_team, bot)
-            boss_fight_is_over = True
-            break
-
-        team_state = check_all_team(current_boss_fight_team)
-        if team_state in ["Left", "Dead"]:
-            break
-        if not boss_fight_is_on:
-            break
-        await asyncio.sleep(2)
 
 
 
@@ -74,7 +63,8 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
     if message.text == "Начать бой с боссом":
         if not boss_fight_is_on:
             boss_fight_is_on = True
-            task = asyncio.create_task(boss_attack())
+            task1 = asyncio.create_task(boss_attack())
+            task2 = asyncio.create_task(boss_check())
         if message.chat.id not in current_boss_fight_team:
             current_boss_fight_team[message.chat.id] = players_dict[message.chat.id]
         if message.chat.id not in boss_fight_team:
@@ -82,16 +72,16 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
         await message.answer(text=villian.presentation())
         await GameState.bossFight.set()
         await message.answer(text="Что же, в атаку", reply_markup=attack_menu())
-    elif message.text == "Соскочить":
+    elif message.text == "Отказаться от затеи":
         await GameState.menuState.set()
-        await message.answer(text="Вы соскакиваете", reply_markup=menu_keyboard())
+        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
     else:
         if boss_fight_is_over:
             await message.answer(text="Предыдущая сессия боя с боссом еще не окончена, предложите всем игрокам выйти", reply_markup=next())
             await GameState.menuState.set()
         else:
             menu = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text="Начать бой с боссом")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True)
+                keyboard=[[KeyboardButton(text="Начать бой с боссом")], [KeyboardButton(text="Отказаться от затеи")]], resize_keyboard=True)
             await message.answer(text="Решите для себя, готовы ли вы\nСпросите у друзей, готовы ли они", reply_markup=menu)
 
 
@@ -100,10 +90,6 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
 @dp.message_handler(state=GameState.bossFight)
 async def boss_fight(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
-    if not villian.alive:
-        await GameState.menuState.set()
-        current_boss_fight_team.pop(message.chat.id, None)
-        await message.answer(text="Ваш противник мертв", reply_markup=next(), parse_mode="HTML")
 
     if not char.alive:
         await fight_presentantion(char, villian, message)
@@ -114,12 +100,23 @@ async def boss_fight(message: types.Message, state: FSMContext):
         if message.text == "Атаковать":
             await char.attack_func(villian, message)
             await fight_presentantion(char, villian, message)
+
         elif message.text == "Соскочить":
-            if await char.leave_boss_fight(current_boss_fight_team, villian, bot, message, message.chat.id):
+            if boss_fight_is_over:
                 boss_fight_team.pop(message.chat.id, None)
+                current_boss_fight_team.pop(message.chat.id, None)
+                await GameState.menuState.set()
+                await message.answer(text="Все и так уже закончилось", reply_markup=menu_keyboard())
+            if await char.leave_boss_fight(current_boss_fight_team, villian, bot, message, message.chat.id) and not boss_fight_is_over:
                 boss_fight_team.pop(message.chat.id, None)
+                current_boss_fight_team.pop(message.chat.id, None)
                 await GameState.menuState.set()
                 await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=menu_keyboard())
+
+        elif message.text == "Закончить":
+            current_boss_fight_team.pop(message.chat.id, None)
+            await GameState.menuState.set()
+            await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
         else:
             pass
 

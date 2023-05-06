@@ -17,8 +17,8 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
-from GameClasses import Unit, Villian
-from Functions import save_id, next, menu_keyboard, attack_menu, boss_end, check_all_team_dead, fight_presentantion, give_villian
+import SomeClasses
+from Functions import next, menu_keyboard, attack_menu, boss_end, check_all_team_dead, fight_presentantion, give_villian
 from SomeAttributes import villian, current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
@@ -74,26 +74,35 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
 @dp.message_handler(state=GameState.bossFight)
 async def boss_fight(message: types.Message, state: FSMContext):
     global boss_fight_is_on, villian
-    unit = players_dict[message.chat.id]
+    char = players_dict[message.chat.id]
     if not villian.alive:
         await message.answer(text="Ваш противник мертв")
         await message.answer(text=boss_end(boss_fight_team), reply_markup=next(), parse_mode="HTML")
         await GameState.menuState.set()
-        await villian.boss_money_dealing(boss_fight_team, message)
-        await villian.boss_exp_dealing(boss_fight_team, message)
+        await villian.boss_money_exp_dealing(boss_fight_team, message)
         current_boss_fight_team.clear()
         boss_fight_team.clear()
         villian = give_villian()
         boss_fight_is_on = False
         return None
 
-    if not unit.alive:
-        await fight_presentantion(unit, villian, message)
+    if not char.alive:
+        await fight_presentantion(char, villian, message)
         await message.answer(text="Вы мертвы", reply_markup=next())
         await GameState.deadState.set()
     else:
-        await unit.attack_func(villian, message)
-        await fight_presentantion(unit, villian, message)
+        if message.text == "Атаковать":
+            await char.attack_func(villian, message)
+            await fight_presentantion(char, villian, message)
+        elif message.text == "Соскочить":
+            if await char.leave_boss_fight(current_boss_fight_team, villian, bot, message, message.chat.id):
+                del boss_fight_team[message.chat.id]
+                del current_boss_fight_team[message.chat.id]
+                await GameState.menuState.set()
+                await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=menu_keyboard())
+                return None
+        else:
+            pass
 
     if check_all_team_dead(current_boss_fight_team):
         await message.answer(text="Вся команда нападавших мертва", reply_markup=next())

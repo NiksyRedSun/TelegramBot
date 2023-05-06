@@ -1,4 +1,4 @@
-from GameClasses import Character, DragonVillian
+import SomeClasses
 from Functions import give_villian
 
 villian = give_villian()

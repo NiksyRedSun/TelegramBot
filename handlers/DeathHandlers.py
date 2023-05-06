@@ -15,8 +15,8 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
-from GameClasses import Unit, Villian, Character
-from Functions import save_id, next, menu_keyboard, death_menu
+import SomeClasses
+from Functions import next, menu_keyboard, death_menu
 from SomeAttributes import villian, players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp

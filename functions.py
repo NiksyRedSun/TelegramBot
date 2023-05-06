@@ -1,6 +1,8 @@
 import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from GameClasses import Character, Villian, SpiderVillian, DragonVillian, GolemVillian, TreeVillian
+from SomeClasses.CharacterClasses import Character
+from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian
+
 
 
 def double_dices():
@@ -10,10 +12,6 @@ def double_dices():
 def dice():
     return random.randint(1, 6)
 
-
-def save_id(message, ids):
-    if message.chat.id not in ids:
-        ids.append(message.chat.id)
 
 
 def next():
@@ -32,7 +30,7 @@ def menu_keyboard():
 
 def attack_menu():
     menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Атаковать")]], resize_keyboard=True)
+        keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True)
     return menu
 
 
@@ -67,13 +65,13 @@ def charChoosing(text):
         case "/tatarin":
             return Character("Айзулбек", "Вы тут за татарина с луком", 25, 8, 3, 4)
         case "/viking":
-            return Character("Сигурд", "Вы тут за викинга, вам ничего не остается кроме как махать мечом", 60, 10, 4, 2)
+            return Character("Сигурд", "Вы тут за викинга, вам ничего\n не остается кроме как махать\n мечом", 60, 10, 4, 2)
         case "/elf":
             return Character("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 1, 6)
         case "/khajiit":
             return Character("Рисаад", "Опция для тех, кто хочет играть за каджита", 30, 7, 1, 5)
         case "/gnom":
-            return Character("Эдукан", "Никакой команде не обойтись без гнома, на вас - размахивать топором", 50, 8, 4, 3)
+            return Character("Эдукан", "Никакой команде не обойтись без\n гнома, на вас - размахивать\n топором", 50, 8, 4, 3)
         case "/testChar":
             return Character("SomePers", "Используем этого перса для тестирования", 50, 1, 1, 1)
 

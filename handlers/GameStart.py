@@ -15,8 +15,8 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
-from GameClasses import Unit, Villian
-from Functions import save_id, next, menu_keyboard, charChoosing
+import SomeClasses
+from Functions import next, menu_keyboard, charChoosing
 from SomeAttributes import villian, players_dict, current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp
@@ -24,7 +24,6 @@ from EasyGameLoader import dp
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    save_id(message, ids)
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Старт")]], resize_keyboard=True, one_time_keyboard=True)
     await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"

@@ -15,7 +15,7 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
-from GameClasses import Unit, Villian
+import SomeClasses
 from Functions import check_all_team_dead
 from SomeAttributes import villian, current_boss_fight_team
 from SomeStates import GameState

@@ -1,151 +1,7 @@
 import random
 import asyncio
 from EasyGameLoader import bot
-
-
-
-def double_dices():
-    return random.randint(1, 6) + random.randint(1, 6)
-
-
-def dice():
-    return random.randint(1, 6)
-
-
-
-class Unit:
-    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
-        self.name = s_name
-        self.story = s_story
-        self.hp = s_hp
-        self.max_hp = self.hp
-        self.attack = s_attack
-        self.defense = s_defense
-        self.initiative = s_initiative
-        self.alive = True
-
-
-    def check_alive(self):
-        if self.hp <= 0:
-            self.hp = 0
-            self.alive = False
-
-
-    def reset(self):
-        self.alive = True
-        self.hp = self.max_hp
-
-
-
-
-class Character(Unit):
-    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
-        super().__init__(s_name, s_story, s_hp, s_attack, s_defense, s_initiative)
-        self.money = 0
-        self.level = 1
-        self.exp = 0
-        self.next_level_exp = 100
-
-
-    def presentation(self):
-
-        def str_to_deathstr(string: str):
-            new_string = map(lambda x: '/', string)
-            return ''.join(new_string)
-
-        pres_name = "<code>" + "+" + self.name.center(30, "-") + "+" + "</code>"
-        pres_level = "<code>" + "+" + ("Уровень: " + str(self.level)).center(30, "-") + "+" + "</code>"
-        text = [
-                f"{pres_name}",
-                f" {self.story}",
-                f" <code>Здоровье: ".ljust(20) + f"{self.hp}/{self.max_hp}</code>",
-                f" <code>Атака: ".ljust(20) + f"{self.attack}</code>",
-                f" <code>Защита: ".ljust(20) + f"{self.defense}</code>",
-                f" <code>Ловкость: ".ljust(20) + f"{self.initiative}</code>",
-                f" <code>Золото: ".ljust(20) + f"{self.money}</code>",
-                f" <code>Опыт: ".ljust(20) + f"{self.exp}/{self.next_level_exp}</code>",
-                f"{pres_level}"
-                ]
-        if self.alive:
-            return '\n'.join(text)
-        else:
-            pres_name = "<code>+" + ("Дух " + self.name).center(30, "-") + "+</code>"
-            text = [str_to_deathstr(text[i]) if i != 2 else text[i] for i in range(len(text))]
-            text[0] = pres_name
-            return '\n'.join(text)
-
-
-
-    def fight_presentation(self):
-        pres_name = "+" + self.name.center(29, "-") + "+"
-        text = [
-                f"<code>{pres_name}</code>",
-                f"Здоровье: {self.hp}/{self.max_hp}".center(54)]
-                # f"Атака: {self.attack}",
-                # f"Защита: {self.defense}",
-                # f"Инициатива: {self.initiative}"]
-        return '\n'.join(text)
-
-
-    def next_level(self):
-        while self.exp > self.next_level_exp:
-            self.next_level_exp = int(100 * 2 ** self.next_level_exp)
-            self.level += 1
-            if self.level % 2 == 0:
-                self.max_hp += 3
-            if self.level % 3 == 0:
-                self.attack += 1
-                self.defense += 1
-            if self.level % 4 == 0:
-                self.initiative += 1
-            self.hp = self.max_hp
-
-
-    async def attack_func(self, villian: Unit, message):
-        critical_hit = False
-        text = []
-        await message.answer(text=f"{self.name} замахивается на противника")
-        await asyncio.sleep(0.7)
-        hero_init = double_dices() + self.initiative
-        villian_init = double_dices() + villian.initiative
-        if hero_init > villian_init:
-
-
-            crit = random.randint(1, 100)
-            if crit in range(1, self.initiative * 6):
-                hit_damage = int(self.attack * 2.5)
-                text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
-                critical_hit = True
-            else:
-                hit_damage = self.attack
-
-
-            damage = hit_damage + dice() - villian.defense
-            if damage <= 0:
-                text.append(f"Изловчившись {self.name} попадает по противнику, но тот остается невредим")
-            else:
-                villian.hp -= damage
-                text.append(f"{self.name} наносит удар прямо в цель, противник теряет {damage} hp")
-                if critical_hit:
-                    text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
-                villian.check_alive()
-        else:
-            text.append(f"{self.name} промахивается")
-        await message.answer(text="\n".join(text), parse_mode="HTML")
-
-
-    def ressurecting(self):
-        self.hp = int(self.max_hp * random.random())
-        self.alive = True
-
-
-    async def fountain_healing(self, heal_hp, message):
-        if heal_hp + self.hp < self.max_hp:
-            self.hp += heal_hp
-            await message.answer(text=f"Живительная влага восстановила вам {heal_hp} hp")
-        else:
-            self.hp = self.max_hp
-            await message.answer(text=f"Фонтан залечил каждую рану на вашем теле")
+from SomeClasses.BasicClasses import Unit, dice, double_dices
 
 
 
@@ -167,19 +23,15 @@ class Villian(Unit):
     def reset(self):
         self.__init__()
 
-    async def boss_money_dealing(self, players: dict, message):
+    async def boss_money_exp_dealing(self, players: dict, message):
         cur_money = int(self.money / len(players))
-        for i in players:
-            players[i].money += cur_money
-        await message.answer(text=f"Каждый из участников битвы получил по {cur_money} монет")
-
-    async def boss_exp_dealing(self, players: dict, message):
         cur_exp = int(self.exp / len(players))
         for i in players:
+            players[i].money += cur_money
             players[i].exp += cur_exp
-        await message.answer(text=f"Каждый из участников битвы получил по {cur_exp} опыта")
-        for i in players:
-            players[i].next_level()
+        text = [f"Каждый из участников битвы получил по {cur_money} монет", f"Каждый из участников битвы получил по {cur_exp} опыта"]
+        await message.answer(text='\n'.join((text)))
+
 
 
 class DragonVillian(Villian):
@@ -414,3 +266,5 @@ class TreeVillian(Villian):
             self.attack_one_func(players[player], quoteIndex, message_text)
         for player in players:
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
+
+

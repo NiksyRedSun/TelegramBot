@@ -32,6 +32,7 @@ async def boss_check_team():
         team_state = check_all_team(current_boss_fight_team)
         if team_state == "Left":
             boss_fight_reset()
+
             break
 
         elif team_state == "Dead":
@@ -47,9 +48,11 @@ async def boss_check():
     global boss_fight_is_over
     while True:
         if not villian.alive:
-            await villian.boss_money_exp_dealing(boss_fight_team, bot)
+            await asyncio.sleep(0.5)
+            await villian.boss_money_exp_dealing(boss_fight_team, current_boss_fight_team, bot)
             boss_fight_team.clear()
             boss_fight_is_over = True
+            task1.cancel()
             break
         await asyncio.sleep(0.1)
 
@@ -61,13 +64,13 @@ def boss_fight_reset():
     boss_fight_team.clear()
     boss_fight_is_on = False
     boss_fight_is_over = False
-    villian = give_villian()
+    task1.cancel()
+
 
 
 
 async def boss_attack():
-    global boss_fight_is_over
-    while not boss_fight_is_over:
+    while True:
         await villian.attack_func(current_boss_fight_team, bot)
         await asyncio.sleep(4)
 
@@ -76,20 +79,22 @@ async def boss_attack():
 
 @dp.message_handler(state=GameState.preBossFight)
 async def pre_boss_fight(message: types.Message, state: FSMContext):
-    global boss_fight_is_on, villian
+    global boss_fight_is_on, villian, task1
     if message.text == "Начать бой с боссом":
         if not boss_fight_is_on:
             boss_fight_is_on = True
+            villian = give_villian()
             task1 = asyncio.create_task(boss_attack())
             task2 = asyncio.create_task(boss_check())
             task3 = asyncio.create_task(boss_check_team())
         if message.chat.id not in current_boss_fight_team:
-            current_boss_fight_team[message.chat.id] = players_dict[message.chat.id]
+            # current_boss_fight_team[message.chat.id] = players_dict[message.chat.id]
+            current_boss_fight_team[message.chat.id] = {"char": players_dict[message.chat.id], "damage": 0}
         if message.chat.id not in boss_fight_team:
             boss_fight_team[message.chat.id] = players_dict[message.chat.id]
         await message.answer(text=villian.presentation())
         await GameState.bossFight.set()
-        await message.answer(text="Что же, в атаку", reply_markup=attack_menu())
+        await message.answer(text="Вы уже в бою", reply_markup=attack_menu())
     elif message.text == "Отказаться от затеи":
         await GameState.menuState.set()
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
@@ -116,7 +121,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
         current_boss_fight_team.pop(message.chat.id, None)
     else:
         if message.text == "Атаковать":
-            await char.attack_func(villian, message)
+            await char.attack_boss_func(villian, message, bot, current_boss_fight_team)
             await fight_presentantion(char, villian, message)
 
         elif message.text == "Соскочить":

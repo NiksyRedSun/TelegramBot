@@ -1,7 +1,7 @@
 import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
-from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian
+from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
 
 
 
@@ -49,7 +49,7 @@ def death_menu():
 def check_all_team(players: dict):
     if len(players) == 0:
         return "Left"
-    if all(map(lambda x: not players[x].alive, players)):
+    if all(map(lambda x: not players[x]["char"].alive, players)):
         return "Dead"
     else:
         return "Alive"
@@ -71,7 +71,7 @@ def charChoosing(text):
         case "/gnom":
             return Character("Эдукан", "Никакой команде не обойтись без\n гнома, на вас - размахивать\n топором", 50, 8, 4, 3)
         case "/testChar":
-            return Character("SomePers", "Используем этого перса для тестирования", 1, 1, 1, 1)
+            return Character("SomePers", "Используем этого перса для тестирования", 1000, 100, 100, 100)
 
 
 async def fight_presentantion(char, enemy, message):
@@ -86,4 +86,4 @@ async def fight_presentantion(char, enemy, message):
         await message.answer(text=line, reply_markup=end_menu(), parse_mode="HTML")
 
 def give_villian():
-    return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian()])
+    return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian()])

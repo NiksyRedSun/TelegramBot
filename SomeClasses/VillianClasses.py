@@ -24,23 +24,30 @@ class Villian(Unit):
     def reset(self):
         self.__init__()
 
-    async def boss_money_exp_dealing(self, players: dict, bot):
-        cur_money = int(self.money / len(players))
-        cur_exp = int(self.exp / len(players))
+    async def boss_money_exp_dealing(self, all_players: dict, players: dict, bot):
+        cur_money = int(self.money / len(all_players))
+        cur_exp = int(self.exp / len(all_players))
         text = [ "<code>+" + "Результаты".center(32, "-") + "+</code>",
-                "<b><code>" + "Рейд-босс мертв".center(34, " ") + "</code></b>",
-                "Имена наших героев:"]
+                "<b><code>" + "Рейд-босс мертв".center(34, " ") + "</code></b>\n",
+                "Урон игроков:"]
 
-        for id in players:
-            text.append(players[id].name)
+        for id in sorted(players.items(), key=lambda x: x[1]["damage"], reverse=True):
+            text.append(f"{id[1]['char'].name} - {id[1]['damage']} урона\n")
+
+
+        if sorted(players.keys()) != sorted(all_players.keys()):
+            text.append(f"Пали в бою:")
+            for player in all_players:
+                if player not in players:
+                    text.append(f"{all_players[player].name}")
 
         text.append(f"Каждый из участников битвы получил по {cur_money} монет")
         text.append(f"Каждый из участников битвы получил по {cur_exp} опыта")
 
-        for player in players:
-            players[player].money += cur_money
-            players[player].exp += cur_exp
-            players[player].next_level()
+        for player in all_players.copy():
+            all_players[player].money += cur_money
+            all_players[player].exp += cur_exp
+            all_players[player].next_level()
             await bot.send_message(chat_id=player,
                                    text='\n'.join(text),
                                    parse_mode="HTML",
@@ -118,7 +125,7 @@ class DragonVillian(Villian):
 
         message_text = []
         for player in players:
-            self.attack_one_func(players[player], quoteIndex, message_text)
+            self.attack_one_func(players[player]["char"], quoteIndex, message_text)
         for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
@@ -186,7 +193,7 @@ class SpiderVillian(Villian):
 
         message_text = []
         for player in players:
-            self.attack_one_func(players[player], quoteIndex, message_text)
+            self.attack_one_func(players[player]["char"], quoteIndex, message_text)
         for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
@@ -254,7 +261,7 @@ class GolemVillian(Villian):
 
         message_text = []
         for player in players:
-            self.attack_one_func(players[player], quoteIndex, message_text)
+            self.attack_one_func(players[player]["char"], quoteIndex, message_text)
         for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
 
@@ -323,8 +330,74 @@ class TreeVillian(Villian):
 
         message_text = []
         for player in players:
-            self.attack_one_func(players[player], quoteIndex, message_text)
+            self.attack_one_func(players[player]["char"], quoteIndex, message_text)
         for player in players.copy():
             await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
+
+
+
+class WyvernVillian(Villian):
+    def __init__(self):
+        self.name = "Виверна"
+        self.story = "Знаете чем отличается виверна от дракона? Одной парой лап, жалом на конце хвоста и отсутствием огненного дыхания"
+        self.hp = 300
+        self.max_hp = self.hp
+        self.attack = 8
+        self.defense = 4
+        self.initiative = 6
+        self.alive = True
+        self.money = random.randint(1000, 1800)
+        self.exp = random.randint(1200, 1800)
+
+
+
+    def attack_one_func(self, char, quouteIndex, text: list):
+        if char.alive:
+            pos_quotes = [f"{char.name} успевает уклониться от жала",
+                          f"{char.name} уворачивается от когтей",
+                            f"{char.name} уклоняется от зубов"]
+            villian_init = double_dices() + self.initiative
+            char_init = double_dices() + char.initiative
+            if villian_init > char_init:
+                damage = self.attack + dice() - char.defense
+                neg_quotes = [f"{char.name} проткнут жалом Виверны и обильно снабжен ядом на {damage} урона",
+                              f"{char.name} не успевает уклониться от когтей виверны получив {damage} урона ",
+                              f"{char.name} оказывается в зубах Виверны и взлетает с ней ввысь, с последующим падением на {damage} урона"]
+                if damage <= 0:
+                    text.append(pos_quotes[quouteIndex])
+                else:
+                    char.hp -= damage
+                    text.append(neg_quotes[quouteIndex])
+                    char.check_alive()
+                    if not char.alive:
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
+            else:
+                text.append(pos_quotes[quouteIndex])
+
+
+    async def attack_func(self, players: dict, bot):
+        quoteIndex = random.randint(0, 2)
+        quotes = [f"{self.name} приготовила своё жало",
+                  f"{self.name} пикирует, выставив вперед когти",
+                  f"{self.name} готовит свои зубы для захвата"]
+        for player in players.copy():
+            await bot.send_message(chat_id=player, text=quotes[quoteIndex])
+        await asyncio.sleep(2)
+
+        self.check_alive()
+        if not self.alive:
+            quotes = [f"{self.name} роняет своё жало",
+                      f"Пикирование виверны переходит в падение",
+                      f"Из пасти Виверны вырывается кровь, орошая поле боя"]
+            for player in players.copy():
+                await bot.send_message(chat_id=player, text=quotes[quoteIndex], parse_mode="HTML")
+            return None
+
+        message_text = []
+        for player in players:
+            self.attack_one_func(players[player]["char"], quoteIndex, message_text)
+        for player in players.copy():
+            await bot.send_message(chat_id=player, text="\n".join(message_text), parse_mode="HTML")
+
 
 

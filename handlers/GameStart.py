@@ -70,7 +70,7 @@ async def after_choice(message: types.Message, state: FSMContext):
     players_dict[message.chat.id].name = message.text
     text = players_dict[message.chat.id].presentation()
     menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="В меню")]], resize_keyboard=True)
+        keyboard=[[KeyboardButton(text="В деревню")]], resize_keyboard=True)
     await message.answer(text=text, reply_markup=menu, parse_mode="HTML")
     await GameState.menuState.set()
 
@@ -91,4 +91,6 @@ async def before_fight(message: types.Message, state: FSMContext):
     elif message.text in ["Бой с мобом", "Магазин", "Инвентарь"]:
         await message.answer(text=f"Функционал в разработке")
     else:
-        await message.answer(text=f"Выберите чем хотите заниматься", reply_markup=menu_keyboard())
+        await message.answer(text=f"Кто-то называет это место городом, в основном - мэр.\n"
+                                  f"Вы и ваши друзья честны друг с другом, поэтому называете это место деревней",
+                             reply_markup=menu_keyboard())

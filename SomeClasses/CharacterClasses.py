@@ -58,7 +58,7 @@ class Character(Unit):
 
     def next_level(self):
         while self.exp > self.next_level_exp:
-            self.next_level_exp = int(100 * 2 ** self.next_level_exp)
+            self.next_level_exp = int(100 * 2 ** self.level)
             self.level += 1
             if self.level % 2 == 0:
                 self.max_hp += 3
@@ -70,7 +70,7 @@ class Character(Unit):
             self.hp = self.max_hp
 
 
-    async def attack_func(self, villian: Unit, message):
+    async def attack_boss_func(self, villian: Unit, message, bot, players):
         critical_hit = False
         text = []
         await message.answer(text=f"Вы замахиваетесь на противника")
@@ -107,12 +107,19 @@ class Character(Unit):
             else:
                 villian.hp -= damage
                 text.append(f"Вы наносите удар прямо в цель, противник теряет {damage} hp")
+                players[message.chat.id]["damage"] += damage
                 if critical_hit:
                     text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
-                villian.check_alive()
+            await message.answer(text="\n".join(text), parse_mode="HTML")
+            villian.check_alive()
+            if not villian.alive:
+                for player in players:
+                    await bot.send_message(chat_id=player, text=f"{self.name} наносит последний удар")
+                    await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML")
+
         else:
             text.append(f"Вы промахиваетесь")
-        await message.answer(text="\n".join(text), parse_mode="HTML")
+            await message.answer(text="\n".join(text), parse_mode="HTML")
 
 
     def ressurecting(self):
@@ -150,12 +157,22 @@ class Character(Unit):
             else:
                 damage = villian.attack + dice()
                 self.hp -= damage
-                await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
-                for player in players:
-                    if player_id != player:
-                        await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, но {villian.name} был инициативнее и снёс герою {damage} ударом в спину",
-                                           parse_mode="HTML")
                 self.check_alive()
+                if not self.alive:
+                    await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp\n"
+                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=ReplyKeyboardMarkup(
+                    keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                    for player in players:
+                        if player_id != player:
+                            await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, мало того что получил ударом в спину, так еще и отъехал",
+                                               parse_mode="HTML")
+                else:
+                    await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
+                    for player in players:
+                        if player_id != player:
+                            await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, но {villian.name} был инициативнее и снёс герою {damage} ударом в спину",
+                                               parse_mode="HTML")
+
                 return False
 
 

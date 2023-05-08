@@ -1,4 +1,5 @@
 from SomeClasses.BasicClasses import Unit, dice, double_dices
+from SomeClasses.VillianClasses import Villian
 import random
 import asyncio
 from EasyGameLoader import bot
@@ -70,22 +71,35 @@ class Character(Unit):
             self.hp = self.max_hp
 
 
-    async def attack_boss_func(self, villian: Unit, message, bot, players):
+    async def attack_boss_func(self, villian: Villian, message, bot, players):
+        quoteIndex = random.randint(0, 5)
+        quotes = [f"Вы замахиваетесь слева",
+                  f"Вы замахиваетесь справа",
+                  f"Вы замахиваетесь для рубящего, нисходящего сверху удара",
+                  f"Вы замахиваетесь для рубящего, восходящего снизу удара",
+                  f"Вы готовите руку для колющего удара над верхней конечностью противника",
+                  f"Вы готовите руку для колющего удара под верхней конечностью противника"]
+
         critical_hit = False
         text = []
-        await message.answer(text=f"Вы замахиваетесь на противника")
+        await message.answer(text=quotes[quoteIndex])
         await asyncio.sleep(0.7)
 
         self.check_alive()
         villian.check_alive()
         if not self.alive:
-            text.append(f"Вы роняете свое оружие захлебываясь кровью")
-            await message.answer(text="\n".join(text), parse_mode="HTML")
+            dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
+                      f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",
+                      f"Ваши внутренности выпадывают наружу, приключение больше не кажется интересным",
+                      f"Ваше оружие падает, вы чувствуете как одежда начинает прилипать к телу из-за многочисленных источников кровотечения под ней. Вам стоило остаться дома",
+                      f"Стоя на коленях и готовясь уйти лбом в землю, вы начинаете забывать о том как оказались здесь и медленно теряете сознание",
+                      f"В последний раз взглянув на свои окровавленные руки, вы начинаете думать о том, была ли эта смерть славной. Вас погружает в вечный сон"]
+            await message.answer(text=random.choice(dead_quotes), parse_mode="HTML")
             return None
 
         if not villian.alive:
-            text.append(f"Вы опускаете свой мечь, опомнившись от ярости")
-            await message.answer(text="\n".join(text), parse_mode="HTML", reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True))
+            await message.answer(text=f"Вы опускаете свой меч, опомнившись от ярости", parse_mode="HTML",
+                                 reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True))
             return None
 
         hero_init = double_dices() + self.initiative
@@ -105,8 +119,27 @@ class Character(Unit):
             if damage <= 0:
                 text.append(f"Изловчившись вы попадаете по противнику, но тот остается невредим")
             else:
+
+                hit_quotes = [f"Ваш меч скользит противнику по боку нанося {damage} урона",
+                          f"Ваш меч на пол секунды застревает в теле противника, затем вы силой вытаскиваете его, вытягивая из противника {damage} hp",
+                          f"Вы едва касаетесь лезвием тела противника, снимая ему {damage} hp",
+                          f"Ваш удар проходиться вскользь по поясу противника нанося {damage} урона",
+                          f"Ваш меч входит в грудь противнику на два сантиметра, тот теряет {damage} урона",
+                          f"Ваш меч скользит по телу противника, снося ему {damage} hp"]
+
+
+                critical_hit_quotes = [f"Ваш меч сбоку залетает в грудь противнику на десять сантиметров и {damage} урона",
+                          f"Вы срезаете противнику кусок тела, нанося {damage} урона",
+                          f"Рубящим ударом вы попадаете в то место, где обычно находятся ключицы, снося {damage} hp",
+                          f"Ваш меч застревает у противника в нижней конечности, силой вырывая его от туда, вы сносите {damage} hp",
+                          f"Колящим ударом ваш меч заходит противнику в грудную клетку на 10 см оставляя там рану на {damage} урона",
+                          f"Ваш удар протыкает нижнюю конечность противника насквозь, при выемке меча противник теряет {damage} hp"]
+
                 villian.hp -= damage
-                text.append(f"Вы наносите удар прямо в цель, противник теряет {damage} hp")
+                if critical_hit:
+                    text.append(critical_hit_quotes[quoteIndex])
+                else:
+                    text.append(hit_quotes[quoteIndex])
                 players[message.chat.id]["damage"] += damage
                 if critical_hit:
                     text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
@@ -115,6 +148,8 @@ class Character(Unit):
             if not villian.alive:
                 for player in players:
                     await bot.send_message(chat_id=player, text=f"{self.name} наносит последний удар")
+                    if villian.quoteIndex is not None:
+                        await bot.send_message(chat_id=player, text=villian.dead_quotes[villian.quoteIndex])
                     await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML")
 
         else:

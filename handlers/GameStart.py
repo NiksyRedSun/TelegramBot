@@ -32,7 +32,7 @@ async def bot_start(message: types.Message):
 
 
 @dp.message_handler(Command("restart"), state=None)
-async def bot_choice(message: types.Message):
+async def re_char_choice(message: types.Message):
     await message.answer(text="Выберите персонажа:\n"
                               "/pirate - пират\n"
                               "/tatarin - татарин\n"
@@ -46,7 +46,7 @@ async def bot_choice(message: types.Message):
 
 
 @dp.message_handler(Text("Старт"), state=None)
-async def bot_choice(message: types.Message):
+async def char_choice(message: types.Message):
     await message.answer(text="Выберите персонажа:\n"
                               "/pirate - пират\n"
                               "/tatarin - татарин\n"
@@ -59,14 +59,14 @@ async def bot_choice(message: types.Message):
 
 
 @dp.message_handler(state=GameState.charChoice)
-async def after_choice(message: types.Message, state: FSMContext):
+async def name_choice(message: types.Message, state: FSMContext):
     players_dict[message.chat.id] = charChoosing(message.text)
     await GameState.nameChoice.set()
     await message.answer(text="Придумайте себе имя, отправьте его сообщением")
 
 
 @dp.message_handler(state=GameState.nameChoice)
-async def after_choice(message: types.Message, state: FSMContext):
+async def to_villiage(message: types.Message, state: FSMContext):
     players_dict[message.chat.id].name = message.text
     text = players_dict[message.chat.id].presentation()
     menu = ReplyKeyboardMarkup(
@@ -76,7 +76,7 @@ async def after_choice(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=GameState.menuState)
-async def before_fight(message: types.Message, state: FSMContext):
+async def villiage(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
     if not char.alive:
         await GameState.deadState.set()
@@ -92,5 +92,7 @@ async def before_fight(message: types.Message, state: FSMContext):
         await message.answer(text=f"Функционал в разработке")
     else:
         await message.answer(text=f"Кто-то называет это место городом, в основном - мэр.\n"
-                                  f"Вы и ваши друзья честны друг с другом, поэтому называете это место деревней",
+                                  f"Вы и ваши друзья честны друг с другом, поэтому называете это место деревней.\n"
+                                  f"Для вас все начинается здесь.\n"
+                                  f"Длинных путешествий не ждите, в основном всё будет происходить неподалеку.",
                              reply_markup=menu_keyboard())

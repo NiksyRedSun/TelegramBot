@@ -48,7 +48,7 @@ async def boss_check():
     global boss_fight_is_over
     while True:
         if not villian.alive:
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(1)
             await villian.boss_money_exp_dealing(boss_fight_team, current_boss_fight_team, bot)
             boss_fight_team.clear()
             boss_fight_is_over = True
@@ -70,6 +70,7 @@ def boss_fight_reset():
 
 
 async def boss_attack():
+    await asyncio.sleep(0.5)
     while True:
         await villian.attack_func(current_boss_fight_team, bot)
         await asyncio.sleep(4)
@@ -88,7 +89,6 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
             task2 = asyncio.create_task(boss_check())
             task3 = asyncio.create_task(boss_check_team())
         if message.chat.id not in current_boss_fight_team:
-            # current_boss_fight_team[message.chat.id] = players_dict[message.chat.id]
             current_boss_fight_team[message.chat.id] = {"char": players_dict[message.chat.id], "damage": 0}
         if message.chat.id not in boss_fight_team:
             boss_fight_team[message.chat.id] = players_dict[message.chat.id]

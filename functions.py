@@ -2,6 +2,7 @@ import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
 from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
+from SomeClasses.MobClasses import SceletonMob, LittleDragonMob
 
 
 
@@ -42,6 +43,12 @@ def end_menu():
 def death_menu():
     menu = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Вернуться")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
+    return menu
+
+def mob_fight_menu():
+    menu = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Выбрать моба")], [KeyboardButton(text="Вернуться в деревню")]],
+        resize_keyboard=True)
     return menu
 
 
@@ -85,5 +92,42 @@ async def fight_presentantion(char, enemy, message):
     else:
         await message.answer(text=line, reply_markup=end_menu(), parse_mode="HTML")
 
+
+async def mob_fight_presentantion(char, mob, message):
+    line = ""
+    line += char.fight_presentation() + "\n"
+    line += "\n" * 2
+    # line += "<code>" + "=" * 31 + "</code>" + "\n"
+    line += mob.fight_presentation()
+    if mob.alive:
+        await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
+    else:
+        menu = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")], [KeyboardButton(text="Вернуться в деревню")]],
+            resize_keyboard=True)
+        await message.answer(text=line, reply_markup=menu, parse_mode="HTML")
+
 def give_villian():
     return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian()])
+
+
+def give_mobs(mob_link=None):
+    mobs_list = [SceletonMob(), LittleDragonMob()]
+    if mob_link is None:
+        text = []
+        for mob in mobs_list:
+            text.append(f"{mob.link} - {mob.name}\n{mob.story}\n")
+        return text
+    else:
+        match mob_link:
+            case "/SceletonMob":
+                return SceletonMob()
+            case "/LittleDragonMob":
+                return LittleDragonMob()
+
+def give_mobs_links():
+    mobs_list = [SceletonMob(), LittleDragonMob()]
+    result_list = []
+    for mob in mobs_list:
+        result_list.append(mob.link)
+    return result_list

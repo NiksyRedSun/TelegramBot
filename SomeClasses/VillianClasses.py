@@ -86,18 +86,29 @@ class DragonVillian(Villian):
                           f"{char.name} уворачивается от когтей Красного дракона"]
             villian_init = double_dices() + self.initiative
             char_init = double_dices() + char.initiative
+
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
-                neg_quotes = [f"{char.name} получает {damage} урона от удара хвостом",
+                neg_quotes = [f"{char.name} получает {damage} урона от удара хвостом, устояв на ногах",
                               f"{char.name} получает {damage} единиц урона от ожогов, задержавшись в пламени на пол секунды",
-                              f"{char.name} теряет кровь из ушей и {damage} hp",
+                              f"{char.name} ловит головную боль, теряя {damage} hp",
                               f"От порыва ветра {char.name} падает на землю теряя {damage} hp",
                               f"{char.name} не успевает увернуться от когтей теряя {damage} hp"]
+
+                really_neg_quotes = [f"{char.name} отлетает от хвоста дракона на 10 метров и получает {damage} урона",
+                              f"{char.name} получает {damage} единиц урона от горения, задержавшись в пламени на полторы секунды",
+                              f"{char.name} теряет кровь из ушей и {damage} hp",
+                              f"{char.name} прижат к земле порывом ветра и теряет {damage} hp",
+                              f"{char.name} поднят когтями и сброшен, потеряв {damage} hp"]
+
                 if damage <= 0:
                     text.append(pos_quotes[self.quoteIndex])
                 else:
                     char.hp -= damage
-                    text.append(neg_quotes[self.quoteIndex])
+                    if damage > 10:
+                        text.append(really_neg_quotes[self.quoteIndex])
+                    else:
+                        text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
                         text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
@@ -160,15 +171,25 @@ class SpiderVillian(Villian):
             char_init = double_dices() + char.initiative
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
+
                 neg_quotes = [f"{char.name} падает на пол запутавшись в паутине и получает {damage} урона",
                               f"{char.name} получает {damage} урона кислотой",
                               f"{char.name} проткнут передней лапой паука на {damage} hp",
+                              f"{char.name} зацеплен жвалами паука на {damage} hp"]
+
+                really_neg_quotes = [f"{char.name} падает на пол запутавшись в паутине, ударяется головой и получает {damage} урона",
+                              f"{char.name} получает {damage} урона кислотой до костей",
+                              f"{char.name} проткнут передней лапой паука насквозь на {damage} hp",
                               f"{char.name} застрял в жвалах паука на {damage} hp"]
+
                 if damage <= 0:
                     text.append(pos_quotes[self.quoteIndex])
                 else:
                     char.hp -= damage
-                    text.append(neg_quotes[self.quoteIndex])
+                    if damage > 10:
+                        text.append(really_neg_quotes[self.quoteIndex])
+                    else:
+                        text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
                         text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
@@ -230,15 +251,24 @@ class GolemVillian(Villian):
             char_init = double_dices() + char.initiative
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
-                neg_quotes = [f"{char.name} теряет зубы и {damage} урона от кулака-молота",
-                              f"{char.name} получает {damage} урона кипящим маслом",
+                neg_quotes = [f"{char.name} теряет зубы и {damage} hp от кулака-молота",
+                              f"{char.name} получает {damage} урона будучи залит потоком масла",
                               f"{char.name} обнаруживает в себе стальной колышек на {damage} hp",
-                              f"{char.name} получает головой Голема в свою и терает {damage} hp"]
+                              f"{char.name} получает головой Голема в свою и теряет {damage} hp"]
+
+                really_neg_quotes = [f"{char.name} теряет лицо и {damage} hp от кулака-молота",
+                              f"{char.name} получает {damage} урона упав в кипящее масло",
+                              f"{char.name} обнаруживает в себе два стальных колышка на {damage} hp",
+                              f"{char.name} получает головой Голема в свою и падая на пол, теряет {damage} hp"]
+
                 if damage <= 0:
                     text.append(pos_quotes[self.quoteIndex])
                 else:
                     char.hp -= damage
-                    text.append(neg_quotes[self.quoteIndex])
+                    if damage > 10:
+                        text.append(really_neg_quotes[self.quoteIndex])
+                    else:
+                        text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
                         text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
@@ -302,14 +332,23 @@ class TreeVillian(Villian):
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
                 neg_quotes = [f"{char.name} получает удар ветками по лицу и {damage} урона",
-                              f"{char.name} сбит с ног корнями Дерева, теряет {damage} урона ",
-                              f"{char.name} обнаруживает на себе химические ожоги и потерю  {damage} hp после разрыва гнилого плода рядом",
+                              f"{char.name} получил корнем в живот и теряет {damage} hp",
+                              f"{char.name} обнаруживает на себе химические ожоги от гнилых плодов и потерю {damage} hp",
                               f"{char.name} окружен, вылетающими из кроны дерева насекомыми, откусывающими от него {damage} hp"]
+
+                really_neg_quotes = [f"{char.name} получает удар ветками в глаза и {damage} урона",
+                              f"{char.name} сбит с ног корнями Дерева, теряет {damage} hp",
+                              f"{char.name} обнаруживает на себе химические ожоги до кости от гнилых плодов и потерю {damage} hp",
+                              f"{char.name} оказывается заперт в кроне дерева с ульем, проедающим ему лицо на {damage} hp"]
+
                 if damage <= 0:
                     text.append(pos_quotes[self.quoteIndex])
                 else:
                     char.hp -= damage
-                    text.append(neg_quotes[self.quoteIndex])
+                    if damage > 10:
+                        text.append(really_neg_quotes[self.quoteIndex])
+                    else:
+                        text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
                         text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
@@ -370,14 +409,22 @@ class WyvernVillian(Villian):
             char_init = double_dices() + char.initiative
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
-                neg_quotes = [f"{char.name} проткнут жалом Виверны и обильно снабжен ядом на {damage} урона",
-                              f"{char.name} не успевает уклониться от когтей виверны получив {damage} урона ",
+                neg_quotes = [f"{char.name} проткнут жалом Виверны на {damage} урона",
+                              f"{char.name} не успевает уклониться от когтей Виверны получив {damage} урона ",
+                              f"{char.name} зацеплен зубами Виверны на {damage} урона"]
+
+                really_neg_quotes = [f"{char.name} проткнут жалом Виверны и обильно снабжен ядом на {damage} урона",
+                              f"{char.name} отлетает на несколько метров от когтей Виверны получив {damage} урона ",
                               f"{char.name} оказывается в зубах Виверны и взлетает с ней ввысь, с последующим падением на {damage} урона"]
+
                 if damage <= 0:
                     text.append(pos_quotes[self.quoteIndex])
                 else:
                     char.hp -= damage
-                    text.append(neg_quotes[self.quoteIndex])
+                    if damage > 10:
+                        text.append(really_neg_quotes[self.quoteIndex])
+                    else:
+                        text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
                         text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")

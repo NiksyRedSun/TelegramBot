@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from Functions import next, menu_keyboard, charChoosing
-from SomeAttributes import villian, players_dict, current_boss_fight_team
+from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp
 
@@ -84,11 +84,14 @@ async def villiage(message: types.Message, state: FSMContext):
     if message.text == "Бой с боссом":
         await GameState.preBossFight.set()
         await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next())
+    elif message.text == "Бой с мобом":
+        await GameState.preMobFight.set()
+        await message.answer(text=f"Попробуйте себя в очищении мира от мобов", reply_markup=next())
     elif message.text == "Фонтан":
         await char.fountain_healing(random.randint(1, 6), message)
     elif message.text == "Персонаж":
         await message.answer(text=char.presentation(), parse_mode="HTML")
-    elif message.text in ["Бой с мобом", "Магазин", "Инвентарь"]:
+    elif message.text in ["Магазин", "Инвентарь"]:
         await message.answer(text=f"Функционал в разработке")
     else:
         await message.answer(text=f"Кто-то называет это место городом, в основном - мэр.\n"

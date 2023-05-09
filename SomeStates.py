@@ -14,3 +14,4 @@ class GameState(StatesGroup):
 
     preMobFight = State()
     mobFight = State()
+    mobChoosing = State()

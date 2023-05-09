@@ -19,7 +19,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from Functions import next, menu_keyboard, attack_menu, check_all_team, fight_presentantion, give_villian
-from SomeAttributes import villian, current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over
+from SomeAttributes import current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
 from threading import Thread
@@ -36,6 +36,7 @@ async def boss_check_team():
             break
 
         elif team_state == "Dead":
+            await asyncio.sleep(1)
             for player in current_boss_fight_team.copy():
                 await bot.send_message(chat_id=player, text="<b>Вся команда отъехала</b>", parse_mode="HTML")
             boss_fight_reset()
@@ -109,7 +110,7 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
 
 
 
-@rate_limit(limit=0.75)
+@rate_limit(limit=1)
 @dp.message_handler(state=GameState.bossFight)
 async def boss_fight(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
@@ -130,7 +131,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameState.menuState.set()
                 await message.answer(text="Все и так уже закончилось", reply_markup=menu_keyboard())
-            if await char.leave_boss_fight(current_boss_fight_team, villian, bot, message, message.chat.id) and not boss_fight_is_over:
+            if await char.leave_boss_fight(current_boss_fight_team, villian, bot, message) and not boss_fight_is_over:
                 boss_fight_team.pop(message.chat.id, None)
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameState.menuState.set()

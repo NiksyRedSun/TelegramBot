@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
-from SomeAttributes import villian, current_boss_fight_team
+from SomeAttributes import current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
 import handlers

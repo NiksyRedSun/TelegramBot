@@ -66,7 +66,10 @@ class Character(Unit):
 
     def next_level(self):
         while self.exp > self.next_level_exp:
-            self.next_level_exp = int(100 * 2 ** self.level)
+            if self.level < 9:
+                self.next_level_exp = int(100 * 2 ** self.level)
+            else:
+                self.next_level_exp = int(100 * (1.85 - (self.level*0.01)) ** self.level)
             self.level += 1
             if self.level % 2 == 0:
                 self.max_hp += 3
@@ -151,7 +154,10 @@ class Character(Unit):
                     await bot.send_message(chat_id=player, text=f"{self.name} наносит последний удар")
                     if villian.quoteIndex is not None:
                         await bot.send_message(chat_id=player, text=villian.dead_quotes[villian.quoteIndex])
-                    await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML")
+                    menu = ReplyKeyboardMarkup(
+                        keyboard=[[KeyboardButton(text="Закончить")]],
+                        resize_keyboard=True)
+                    await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML", reply_markup=menu)
 
         else:
             text.append(f"Вы промахиваетесь")
@@ -181,8 +187,7 @@ class Character(Unit):
             return None
 
         if not mob.alive:
-            await message.answer(text=f"Вы опускаете свой меч, опомнившись от ярости", parse_mode="HTML",
-                                 reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+            await message.answer(text=f"Вы опускаете свой меч, опомнившись от ярости", parse_mode="HTML")
             return None
 
         hero_init = double_dices() + self.initiative
@@ -230,9 +235,12 @@ class Character(Unit):
             mob.check_alive()
             if not mob.alive:
                 menu = ReplyKeyboardMarkup(
-                    keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="Вернуться в деревню")]],
+                    keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
                     resize_keyboard=True)
-                await message.answer(text=mob.dead_quotes[mob.quoteIndex], reply_markup=menu)
+                if mob.quoteIndex is not None:
+                    await message.answer(text=mob.dead_quotes[mob.quoteIndex], reply_markup=menu)
+                else:
+                    await message.answer(text=random.choice(mob.dead_quotes), reply_markup=menu)
                 mob_fighters[message.chat.id]['death_mobs'] += 1
         else:
             text.append(f"Вы промахиваетесь")

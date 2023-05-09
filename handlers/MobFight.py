@@ -15,18 +15,18 @@ import asyncio
 async def mob_check(mob, message):
     while True:
         if not mob.alive:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.15)
             await mob.money_exp_having(players_dict[message.chat.id], message)
             mob_fight_dict[message.chat.id]["mob_task"].cancel()
             mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
             break
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.6)
 
 
 async def mob_attack(mob, message):
     await asyncio.sleep(0.5)
     while True:
-        await mob.attack_func(players_dict[message.chat.id], message)
+        await mob.attack_func(players_dict[message.chat.id], message, )
         await asyncio.sleep(2)
 
 
@@ -104,10 +104,6 @@ async def boss_fight(message: types.Message, state: FSMContext):
             await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu())
             await message.answer(text='\n'.join(give_mobs()))
 
-        elif message.text == "Вернуться в деревню" and not mob.alive:
-            await message.answer(text=f"Вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов")
-            await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
-            await GameState.menuState.set()
-            mob_fight_dict.pop(message.chat.id, None)
+
         else:
             pass

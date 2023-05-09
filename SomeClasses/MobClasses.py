@@ -32,7 +32,7 @@ class Mob(Unit):
         player.exp += self.exp
         player.next_level()
         menu = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")], [KeyboardButton(text="Вернуться в деревню")]],
+            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
             resize_keyboard=True)
         await message.answer(text=f"{player.name} получает {self.money} монет и {self.exp} опыта за убийство", reply_markup=menu)
 
@@ -99,7 +99,8 @@ class SceletonMob(Mob):
                 await message.answer(text=neg_quotes[self.quoteIndex])
                 char.check_alive()
                 if not char.alive:
-                    await message.answer(text=killed_quotes[self.quoteIndex])
+                    await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+                    keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
 
@@ -155,9 +156,9 @@ class LittleDragonMob(Mob):
                           f"Вы получаете {damage} очков головной боли от пронзительного вопля дракона",
                           f"Вы находите на своем теле следы от когтей дракона на {damage} урона"]
 
-            killed_quotes = [f"Падая на колени вы чувствуйте сильный укус на своем теле, разрывая рубашку вы видите следы зубов дракона, из которых обильно сочится кровь",
+            killed_quotes = [f"Падая на колени вы чувствуйте сильный укус на своем теле, разрывая рубашку вы видите следы зубов дракона, из которых обильно сочится кровь, вы начинаете терять сознание",
                           f"Будучи неспособным думать ни о чем кроме шума в голове и крови из ушей вы начинаете терять сознание",
-                          f"Лежа на холодном полу, вы ощущаете как дракон пытается полакомиться вашей селезенкой"]
+                          f"Лёжа на холодном полу, вы ощущаете как дракон пытается полакомиться вашей селезенкой"]
             if damage <= 0:
                 await message.answer(text=pos_quotes[self.quoteIndex])
             else:
@@ -165,6 +166,8 @@ class LittleDragonMob(Mob):
                 await message.answer(text=neg_quotes[self.quoteIndex])
                 char.check_alive()
                 if not char.alive:
-                    await message.answer(text=killed_quotes[self.quoteIndex])
+                    await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+                    keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
+        self.quoteIndex = None

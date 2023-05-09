@@ -102,10 +102,15 @@ async def mob_fight_presentantion(char, mob, message):
     if mob.alive:
         await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
     else:
-        menu = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")], [KeyboardButton(text="Вернуться в деревню")]],
+        if char.alive:
+            menu = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
             resize_keyboard=True)
-        await message.answer(text=line, reply_markup=menu, parse_mode="HTML")
+            await message.answer(text=line, reply_markup=menu, parse_mode="HTML")
+        else:
+            menu = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True)
+            await message.answer(text=line, reply_markup=menu, parse_mode="HTML")
 
 def give_villian():
     return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian()])

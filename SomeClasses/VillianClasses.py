@@ -29,14 +29,14 @@ class Villian(Unit):
         cur_exp = int(self.exp / len(all_players))
         text = [ "<code>+" + "Результаты".center(32, "-") + "+</code>",
                 "<b><code>" + "Рейд-босс мертв".center(34, " ") + "</code></b>\n",
-                "Урон игроков:"]
+                "Урон игроков: \n"]
 
         for id in sorted(players.items(), key=lambda x: x[1]["damage"], reverse=True):
-            text.append(f"{id[1]['char'].name} - {id[1]['damage']} урона\n")
+            text.append(f"{id[1]['char'].name} - {id[1]['damage']} урона")
 
 
         if sorted(players.keys()) != sorted(all_players.keys()):
-            text.append(f"Пали в бою:")
+            text.append(f"\nПали в бою:")
             for player in all_players:
                 if player not in players:
                     text.append(f"{all_players[player].name}")

@@ -55,7 +55,7 @@ async def boss_check():
             boss_fight_is_over = True
             task1.cancel()
             break
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.5)
 
 
 

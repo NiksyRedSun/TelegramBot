@@ -93,6 +93,16 @@ async def villiage(message: types.Message, state: FSMContext):
         await message.answer(text=char.presentation(), parse_mode="HTML")
     elif message.text in ["Магазин", "Инвентарь"]:
         await message.answer(text=f"Функционал в разработке")
+    elif message.text == "Рестарт":
+        await message.answer(text="Выберите персонажа:\n"
+                                  "/pirate - пират\n"
+                                  "/tatarin - татарин\n"
+                                  "/viking - викинг\n"
+                                  "/elf - эльф\n"
+                                  "/khajiit - каджит\n"
+                                  "/gnom - гном\n"
+                                  "/testChar - под тест\n")
+        await GameState.charChoice.set()
     else:
         await message.answer(text=f"Кто-то называет это место городом, в основном - мэр.\n"
                                   f"Вы и ваши друзья честны друг с другом, поэтому называете это место деревней.\n"

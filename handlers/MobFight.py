@@ -12,22 +12,29 @@ from RateLimit import rate_limit, ThrottlingMiddleware
 import asyncio
 
 
-
-async def mob_attack(message):
-    await asyncio.sleep(0.5)
-    while mob_fight_dict[message.chat.id]["mob"].alive:
-        await mob_fight_dict[message.chat.id]["mob"].attack_func(players_dict[message.chat.id], message)
-        await asyncio.sleep(2)
-        if not mob_fight_dict[message.chat.id]["mob"].alive:
-            await mob_fight_dict[message.chat.id]["mob"].money_exp_having(players_dict[message.chat.id], message)
+async def mob_check(mob, message):
+    while True:
+        if not mob.alive:
+            await asyncio.sleep(1)
+            await mob.money_exp_having(players_dict[message.chat.id], message)
+            mob_fight_dict[message.chat.id]["mob_task"].cancel()
+            mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
             break
+        await asyncio.sleep(0.5)
+
+
+async def mob_attack(mob, message):
+    await asyncio.sleep(0.5)
+    while True:
+        await mob.attack_func(players_dict[message.chat.id], message)
+        await asyncio.sleep(2)
 
 
 
 @dp.message_handler(state=GameState.preMobFight)
 async def pre_boss_fight(message: types.Message, state: FSMContext):
     if message.text == "Выбрать моба":
-        mob_fight_dict[message.chat.id] = {"mob": None, "mob_task": None, "death_mobs": 0}
+        mob_fight_dict[message.chat.id] = {"mob": None, "mob_task": None, "mob_check_task": None, "death_mobs": 0}
         await GameState.mobChoosing.set()
         await message.answer(text="Выбирайте из предложенных")
         await message.answer(text='\n'.join(give_mobs()))
@@ -44,9 +51,12 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
     if message.text in give_mobs_links():
         mob_link = message.text
         mob_fight_dict[message.chat.id]["mob"] = give_mobs(mob_link)
+        mob = mob_fight_dict[message.chat.id]["mob"]
         await GameState.mobFight.set()
         await message.answer(text="Вы уже в бою", reply_markup=attack_menu())
-        mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(message))
+        mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(mob, message))
+        mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
+
     elif message.text == "Вернуться в деревню":
         await GameState.menuState.set()
         await message.answer(text=f"Вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов")
@@ -70,6 +80,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
         await message.answer(text=f"Прежде чем умереть, вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов", reply_markup=next())
         await GameState.deadState.set()
         mob_fight_dict[message.chat.id]["mob_task"].cancel()
+        mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
         mob_fight_dict.pop(message.chat.id, None)
     else:
         if message.text == "Атаковать":
@@ -79,12 +90,14 @@ async def boss_fight(message: types.Message, state: FSMContext):
             if await char.leave_mob_fight(mob, message):
                 await GameState.mobChoosing.set()
                 mob_fight_dict[message.chat.id]["mob_task"].cancel()
+                mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
                 await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=next())
 
         elif message.text == "Продолжить убивать" and not mob.alive:
             await message.answer(text="Вы уже в бою", reply_markup=attack_menu())
             mob_fight_dict[message.chat.id]["mob"].reset()
-            mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(message))
+            mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(mob, message))
+            mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
 
         elif message.text == "К выбору моба" and not mob.alive:
             await GameState.mobChoosing.set()

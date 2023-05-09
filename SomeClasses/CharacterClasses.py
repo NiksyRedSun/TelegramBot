@@ -95,6 +95,7 @@ class Character(Unit):
         self.check_alive()
         villian.check_alive()
         if not self.alive:
+            await message.answer(text=random.choice(self.dead_quotes), reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Продолжить")]]))
             return None
 
         if not villian.alive:
@@ -158,6 +159,8 @@ class Character(Unit):
 
 
     async def attack_mob_func(self, mob: Mob, message, mob_fighters: dict):
+        if not self.alive:
+            return None
         quoteIndex = random.randint(0, 5)
         quotes = [f"Вы замахиваетесь слева",
                   f"Вы замахиваетесь справа",
@@ -251,12 +254,12 @@ class Character(Unit):
 
 
 
-    async def leave_boss_fight(self, players: dict, villian, bot, message, player_id):
+    async def leave_boss_fight(self, players: dict, villian, bot, message):
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init - villian_init > 2:
             for player in players:
-                if player_id != player:
+                if message.chat.id != player:
                     await bot.send_message(chat_id=player, text=f"{self.name} удачно соскочил с битвы", parse_mode="HTML")
             return True
         else:
@@ -264,7 +267,7 @@ class Character(Unit):
             if init > 3:
                 await message.answer(text="У вас не получилось соскочить с битвы")
                 for player in players:
-                    if player_id != player:
+                    if message.chat.id != player:
                         await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, но облажался",
                                            parse_mode="HTML")
                 return False
@@ -277,13 +280,13 @@ class Character(Unit):
                                               f"Спешу сообщить, что этот удар был для вас последним", reply_markup=ReplyKeyboardMarkup(
                     keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
                     for player in players:
-                        if player_id != player:
+                        if message.chat.id != player:
                             await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, мало того что получил ударом в спину, так еще и отъехал",
                                                parse_mode="HTML")
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
                     for player in players:
-                        if player_id != player:
+                        if message.chat.id != player:
                             await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, но {villian.name} был инициативнее и снёс герою {damage} ударом в спину",
                                                parse_mode="HTML")
 

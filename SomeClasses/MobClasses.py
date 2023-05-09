@@ -65,7 +65,9 @@ class SceletonMob(Mob):
                   f"{self.name} замахивается мечом справа",
                   f"{self.name} замахивается мечом сверху"]
 
-        await message.answer(text=quotes[self.quoteIndex])
+
+        await message.answer(text=quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True))
         await asyncio.sleep(2)
 
         self.check_alive()
@@ -132,7 +134,8 @@ class LittleDragonMob(Mob):
                   f"{self.name} начинает пронзительно вопить",
                   f"{self.name} замахивается на вас лапами"]
 
-        await message.answer(text=quotes[self.quoteIndex])
+        await message.answer(text=quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True))
         await asyncio.sleep(2)
 
 
@@ -153,7 +156,7 @@ class LittleDragonMob(Mob):
                           f"Вы находите на своем теле следы от когтей дракона на {damage} урона"]
 
             killed_quotes = [f"Падая на колени вы чувствуйте сильный укус на своем теле, разрывая рубашку вы видите следы зубов дракона, из которых обильно сочится кровь",
-                          f"Будучи неспособным думать ни о чем кроме шума в голови и крови из ушей вы начинаете терять сознание",
+                          f"Будучи неспособным думать ни о чем кроме шума в голове и крови из ушей вы начинаете терять сознание",
                           f"Лежа на холодном полу, вы ощущаете как дракон пытается полакомиться вашей селезенкой"]
             if damage <= 0:
                 await message.answer(text=pos_quotes[self.quoteIndex])

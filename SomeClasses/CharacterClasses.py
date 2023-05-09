@@ -66,7 +66,7 @@ class Character(Unit):
 
     def next_level(self):
         while self.exp > self.next_level_exp:
-            if self.level < 9:
+            if self.level < 8:
                 self.next_level_exp = int(100 * 2 ** self.level)
             else:
                 self.next_level_exp = int(100 * (1.85 - (self.level*0.01)) ** self.level)

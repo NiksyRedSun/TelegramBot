@@ -26,7 +26,9 @@ async def mob_check(mob, message):
 async def mob_attack(mob, message):
     await asyncio.sleep(0.5)
     while True:
-        await mob.attack_func(players_dict[message.chat.id], message, )
+        if message.chat.id not in mob_fight_dict or not players_dict[message.chat.id].alive:
+            break
+        await mob.attack_func(players_dict[message.chat.id], message)
         await asyncio.sleep(2)
 
 

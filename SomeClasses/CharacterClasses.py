@@ -16,6 +16,7 @@ class Character(Unit):
         self.level = 1
         self.exp = 0
         self.next_level_exp = 100
+        self.in_attack = False
         self.dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
                       f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",
                       f"Ваши внутренности выпадывают наружу, приключение больше не кажется интересным",
@@ -167,6 +168,7 @@ class Character(Unit):
     async def attack_mob_func(self, mob: Mob, message, mob_fighters: dict):
         if not self.alive:
             return None
+        self.in_attack = True
         quoteIndex = random.randint(0, 5)
         quotes = [f"Вы замахиваетесь слева",
                   f"Вы замахиваетесь справа",
@@ -184,6 +186,7 @@ class Character(Unit):
         mob.check_alive()
 
         if not self.alive:
+            self.in_attack = False
             return None
 
         if not mob.alive:
@@ -245,6 +248,7 @@ class Character(Unit):
         else:
             text.append(f"Вы промахиваетесь")
             await message.answer(text="\n".join(text), parse_mode="HTML")
+        self.in_attack = False
 
 
     def ressurecting(self):

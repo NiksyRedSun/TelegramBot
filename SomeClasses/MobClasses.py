@@ -99,8 +99,12 @@ class SceletonMob(Mob):
                 await message.answer(text=neg_quotes[self.quoteIndex])
                 char.check_alive()
                 if not char.alive:
-                    await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-                    keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                    if char.in_attack:
+                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=ReplyKeyboardMarkup(
+                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                    else:
+                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
 
@@ -166,8 +170,84 @@ class LittleDragonMob(Mob):
                 await message.answer(text=neg_quotes[self.quoteIndex])
                 char.check_alive()
                 if not char.alive:
-                    await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-                    keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                    if char.in_attack:
+                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=ReplyKeyboardMarkup(
+                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                    else:
+                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+        else:
+            await message.answer(text=pos_quotes[self.quoteIndex])
+        self.quoteIndex = None
+
+
+
+class OrcMob(Mob):
+    def __init__(self):
+        self.name = "Орк"
+        self.story = "Типичный злой орчина. Выше вас на пол-головы, шире на половину груди. В каком-либо племени не состоит"
+        self.hp = 45
+        self.max_hp = self.hp
+        self.attack = 9
+        self.defense = 4
+        self.initiative = 6
+        self.alive = True
+        self.money = random.randint(400, 650)
+        self.exp = random.randint(400, 650)
+        self.link = "/OrcMob"
+        self.quoteIndex = 0
+        self.dead_quotes = [f"Из Орка сыплются кишки, но кажется, что его это совсем не интересует",
+                            f'"Спасибо за славную смерть", - его последние слова',
+                            f"Орк встречает свою смерть, падая спокойным лицом вверх"]
+
+
+    async def attack_func(self, char, message):
+        if not self.alive or not char.alive:
+            return None
+        self.quoteIndex = random.randint(0, 2)
+        quotes = [f"{self.name} замахивается на вас сверху",
+                  f"{self.name} хочет ударить вас эфесом своего меча",
+                  f"{self.name} готовит ногу для удара"]
+
+        await message.answer(text=quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True))
+        await asyncio.sleep(2)
+
+
+        self.check_alive()
+        if not self.alive:
+            return None
+
+        pos_quotes = [f"Вы отходите вбок, пропуская удар мимо себя",
+                      f"Вы отводите голову вбок на пару сантиметров и этого достаточно",
+                      f"Вы поворачиваете свое тело на 90 градусов по часовой стрелке и пропускаете ногу орка мимо себя"]
+
+        villian_init = double_dices() + self.initiative
+        char_init = double_dices() + char.initiative
+        if villian_init > char_init:
+            damage = self.attack + dice() - char.defense
+            neg_quotes = [f"Вы получаете {damage} урона от рассечения груди, не успевая довернуться",
+                          f"Вы недостаточно отводите голову в бок, и теряете лицо на {damage} hp",
+                          f"Вы не до конца разворачиваете свое тело и получаете пяткой орка в бедро на {damage} урона"]
+
+            killed_quotes = [f"Мгновение назад, вы отвлеклись на боль от ранения. А теперь "
+                             f"вы чувствуете как вам в шею сзади помещается кинжал. Спазм шейных мышц заставляет вас еще раз посмотреть на небо перед смертью",
+                          f"Последнее, что вы видите, падая на землю, это пятку забивающего вас до смерти Орка",
+                          f"После небольшой потери равновесия вы теряете врага из виду, и находите кинжал у себя в пояснице. Отнявшиеся ноги не позволяют вам двигаться"
+                          f"и Орк оставляет вас на съедение стервятникам"]
+            if damage <= 0:
+                await message.answer(text=pos_quotes[self.quoteIndex])
+            else:
+                char.hp -= damage
+                await message.answer(text=neg_quotes[self.quoteIndex])
+                char.check_alive()
+                if not char.alive:
+                    if char.in_attack:
+                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=ReplyKeyboardMarkup(
+                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                    else:
+                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
+                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
         self.quoteIndex = None

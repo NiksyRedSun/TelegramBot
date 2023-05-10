@@ -2,7 +2,7 @@ import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
 from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
-from SomeClasses.MobClasses import SceletonMob, LittleDragonMob
+from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob
 
 
 
@@ -99,7 +99,7 @@ async def mob_fight_presentantion(char, mob, message):
     line += "\n" * 2
     # line += "<code>" + "=" * 31 + "</code>" + "\n"
     line += mob.fight_presentation()
-    if mob.alive:
+    if mob.alive and char.alive:
         await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
     else:
         if char.alive:
@@ -117,7 +117,7 @@ def give_villian():
 
 
 def give_mobs(mob_link=None):
-    mobs_list = [SceletonMob(), LittleDragonMob()]
+    mobs_list = [SceletonMob(), LittleDragonMob(), OrcMob()]
     if mob_link is None:
         text = []
         for mob in mobs_list:
@@ -129,9 +129,12 @@ def give_mobs(mob_link=None):
                 return SceletonMob()
             case "/LittleDragonMob":
                 return LittleDragonMob()
+            case "/OrcMob":
+                return OrcMob()
+
 
 def give_mobs_links():
-    mobs_list = [SceletonMob(), LittleDragonMob()]
+    mobs_list = [SceletonMob(), LittleDragonMob(), OrcMob()]
     result_list = []
     for mob in mobs_list:
         result_list.append(mob.link)

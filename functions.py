@@ -3,6 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
 from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
 from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob
+from SomeKeyboards import attack_menu, menu_keyboard, end_menu
 
 
 
@@ -12,44 +13,6 @@ def double_dices():
 
 def dice():
     return random.randint(1, 6)
-
-
-
-def next():
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True)
-    return menu
-
-
-def menu_keyboard():
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
-                  [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")], [KeyboardButton(text="Персонаж")],
-                  [KeyboardButton(text="Фонтан")]], resize_keyboard=True)
-    return menu
-
-
-def attack_menu():
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True)
-    return menu
-
-def end_menu():
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True)
-    return menu
-
-
-def death_menu():
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Вернуться")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
-    return menu
-
-def mob_fight_menu():
-    menu = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Выбрать моба")], [KeyboardButton(text="Вернуться в деревню")]],
-        resize_keyboard=True)
-    return menu
 
 
 

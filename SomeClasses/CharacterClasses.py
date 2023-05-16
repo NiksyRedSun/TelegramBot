@@ -5,6 +5,7 @@ import random
 import asyncio
 from EasyGameLoader import bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
+from SomeKeyboards import next, end_menu, attack_menu, menu_keyboard, mob_next
 
 
 
@@ -99,12 +100,12 @@ class Character(Unit):
         self.check_alive()
         villian.check_alive()
         if not self.alive:
-            await message.answer(text=random.choice(self.dead_quotes), reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Продолжить")]]))
+            await message.answer(text=random.choice(self.dead_quotes), reply_markup=next())
             return None
 
         if not villian.alive:
             await message.answer(text=f"Вы опускаете свой меч, опомнившись от ярости", parse_mode="HTML",
-                                 reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True))
+                                 reply_markup=ReplyKeyboardMarkup(keyboard=end_menu()))
             return None
 
         hero_init = double_dices() + self.initiative
@@ -155,9 +156,7 @@ class Character(Unit):
                     await bot.send_message(chat_id=player, text=f"{self.name} наносит последний удар")
                     if villian.quoteIndex is not None:
                         await bot.send_message(chat_id=player, text=villian.dead_quotes[villian.quoteIndex])
-                    menu = ReplyKeyboardMarkup(
-                        keyboard=[[KeyboardButton(text="Закончить")]],
-                        resize_keyboard=True)
+                    menu = end_menu()
                     await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML", reply_markup=menu)
 
         else:
@@ -237,9 +236,7 @@ class Character(Unit):
             await message.answer(text="\n".join(text), parse_mode="HTML")
             mob.check_alive()
             if not mob.alive:
-                menu = ReplyKeyboardMarkup(
-                    keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
-                    resize_keyboard=True)
+                menu = mob_next()
                 if mob.quoteIndex is not None:
                     await message.answer(text=mob.dead_quotes[mob.quoteIndex], reply_markup=menu)
                 else:
@@ -321,8 +318,7 @@ class Character(Unit):
                 self.check_alive()
                 if not self.alive:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp\n"
-                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=ReplyKeyboardMarkup(
-                    keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=next())
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
                 return False

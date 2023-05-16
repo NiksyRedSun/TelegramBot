@@ -3,7 +3,7 @@ import asyncio
 from EasyGameLoader import bot
 from SomeClasses.BasicClasses import Unit, dice, double_dices
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-
+from SomeKeyboards import  attack_menu, death_menu, end_menu
 
 
 class Villian(Unit):
@@ -51,7 +51,7 @@ class Villian(Unit):
             await bot.send_message(chat_id=player,
                                    text='\n'.join(text),
                                    parse_mode="HTML",
-                                   reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True))
+                                   reply_markup=end_menu())
 
 
 

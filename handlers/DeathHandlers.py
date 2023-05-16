@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
-from Functions import next, menu_keyboard, death_menu
+from SomeKeyboards import next, menu_keyboard, death_menu
 from SomeAttributes import players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp

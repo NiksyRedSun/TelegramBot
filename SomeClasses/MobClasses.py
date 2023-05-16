@@ -3,6 +3,7 @@ import random
 import asyncio
 from EasyGameLoader import bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
+from SomeKeyboards import next, end_menu, attack_menu, menu_keyboard, mob_next
 
 
 
@@ -31,10 +32,7 @@ class Mob(Unit):
         player.money += self.money
         player.exp += self.exp
         player.next_level()
-        menu = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
-            resize_keyboard=True)
-        await message.answer(text=f"{player.name} получает {self.money} монет и {self.exp} опыта за убийство", reply_markup=menu)
+        await message.answer(text=f"{player.name} получает {self.money} монет и {self.exp} опыта за убийство", reply_markup=mob_next())
 
 
 
@@ -66,12 +64,12 @@ class SceletonMob(Mob):
                   f"{self.name} замахивается мечом сверху"]
 
 
-        await message.answer(text=quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True))
+        await message.answer(text=quotes[self.quoteIndex], reply_markup=attack_menu())
         await asyncio.sleep(2)
 
+        char.check_alive()
         self.check_alive()
-        if not self.alive:
+        if not self.alive or not char.alive:
             return None
 
 
@@ -100,11 +98,9 @@ class SceletonMob(Mob):
                 char.check_alive()
                 if not char.alive:
                     if char.in_attack:
-                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=next())
                     else:
-                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=next())
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
 
@@ -139,13 +135,12 @@ class LittleDragonMob(Mob):
                   f"{self.name} начинает пронзительно вопить",
                   f"{self.name} замахивается на вас лапами"]
 
-        await message.answer(text=quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True))
+        await message.answer(text=quotes[self.quoteIndex], reply_markup=attack_menu())
         await asyncio.sleep(2)
 
-
+        char.check_alive()
         self.check_alive()
-        if not self.alive:
+        if not self.alive or not char.alive:
             return None
 
         pos_quotes = [f"Вы отходите назад, успевая уклониться зубов Молодого дракона",
@@ -171,11 +166,9 @@ class LittleDragonMob(Mob):
                 char.check_alive()
                 if not char.alive:
                     if char.in_attack:
-                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=next())
                     else:
-                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=next())
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
         self.quoteIndex = None
@@ -209,13 +202,13 @@ class OrcMob(Mob):
                   f"{self.name} хочет ударить вас эфесом своего меча",
                   f"{self.name} готовит ногу для удара"]
 
-        await message.answer(text=quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Соскочить")]], resize_keyboard=True))
+        await message.answer(text=quotes[self.quoteIndex], reply_markup=attack_menu())
         await asyncio.sleep(2)
 
 
+        char.check_alive()
         self.check_alive()
-        if not self.alive:
+        if not self.alive or not char.alive:
             return None
 
         pos_quotes = [f"Вы отходите вбок, пропуская удар мимо себя",
@@ -243,11 +236,9 @@ class OrcMob(Mob):
                 char.check_alive()
                 if not char.alive:
                     if char.in_attack:
-                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                        await message.answer(text=random.choice(char.dead_quotes), reply_markup=next())
                     else:
-                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
+                        await message.answer(text=killed_quotes[self.quoteIndex], reply_markup=next())
         else:
             await message.answer(text=pos_quotes[self.quoteIndex])
         self.quoteIndex = None

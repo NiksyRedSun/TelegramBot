@@ -17,8 +17,8 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
-import SomeClasses
-from Functions import next, menu_keyboard, attack_menu, check_all_team, fight_presentantion, give_villian
+from Functions import check_all_team, fight_presentantion, give_villian
+from SomeKeyboards import menu_keyboard, attack_menu
 from SomeAttributes import current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over
 from SomeStates import GameState
 from EasyGameLoader import dp, bot

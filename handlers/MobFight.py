@@ -6,7 +6,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from aiogram.dispatcher.storage import FSMContext
 from SomeStates import GameState
 from EasyGameLoader import dp
-from Functions import next, menu_keyboard, give_mobs, give_mobs_links, attack_menu, mob_fight_presentantion, mob_fight_menu
+from Functions import menu_keyboard, give_mobs, give_mobs_links, attack_menu, mob_fight_presentantion
+from SomeKeyboards import next, end_menu, attack_menu, menu_keyboard, mob_next, mob_fight_menu
 from SomeAttributes import players_dict, mob_fight_dict
 from RateLimit import rate_limit, ThrottlingMiddleware
 import asyncio

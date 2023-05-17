@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
-from SomeKeyboards import next, menu_keyboard, death_menu
+from SomeKeyboards import next_keyb, menu_keyb, death_menu_keyb
 from SomeAttributes import players_dict
 from SomeStates import GameState
 from EasyGameLoader import dp
@@ -27,7 +27,7 @@ from EasyGameLoader import dp
 async def after_choice(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
     if message.text == "Вернуться":
-        await message.answer(text="Вас восстанавливает", reply_markup=menu_keyboard())
+        await message.answer(text="Вас восстанавливает", reply_markup=menu_keyb)
         await GameState.menuState.set()
         char.ressurecting()
     elif message.text == "Персонаж":
@@ -35,4 +35,4 @@ async def after_choice(message: types.Message, state: FSMContext):
         await message.answer(text=text, parse_mode="HTML")
     else:
         await message.answer(text="Смерть - это просто часть пути. К счастью вам повезло, "
-                              "и в этом мире смерть не является его концом.", reply_markup=death_menu())
+                              "и в этом мире смерть не является его концом.", reply_markup=death_menu_keyb)

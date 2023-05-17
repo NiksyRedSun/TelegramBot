@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
 from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
 from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob
-from SomeKeyboards import attack_menu, menu_keyboard, end_menu
+from SomeKeyboards import attack_menu_keyb, menu_keyb, end_menu_keyb, mob_next_keyb, next_keyb
 
 
 
@@ -51,9 +51,9 @@ async def fight_presentantion(char, enemy, message):
     # line += "<code>" + "=" * 31 + "</code>" + "\n"
     line += enemy.fight_presentation()
     if enemy.alive:
-        await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
+        await message.answer(text=line, reply_markup=attack_menu_keyb, parse_mode="HTML")
     else:
-        await message.answer(text=line, reply_markup=end_menu(), parse_mode="HTML")
+        await message.answer(text=line, reply_markup=end_menu_keyb, parse_mode="HTML")
 
 
 async def mob_fight_presentantion(char, mob, message):
@@ -63,17 +63,12 @@ async def mob_fight_presentantion(char, mob, message):
     # line += "<code>" + "=" * 31 + "</code>" + "\n"
     line += mob.fight_presentation()
     if mob.alive and char.alive:
-        await message.answer(text=line, reply_markup=attack_menu(), parse_mode="HTML")
+        await message.answer(text=line, reply_markup=attack_menu_keyb, parse_mode="HTML")
     else:
         if char.alive:
-            menu = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
-            resize_keyboard=True)
-            await message.answer(text=line, reply_markup=menu, parse_mode="HTML")
+            await message.answer(text=line, reply_markup=mob_next_keyb, parse_mode="HTML")
         else:
-            menu = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True)
-            await message.answer(text=line, reply_markup=menu, parse_mode="HTML")
+            await message.answer(text=line, reply_markup=next_keyb, parse_mode="HTML")
 
 def give_villian():
     return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian()])

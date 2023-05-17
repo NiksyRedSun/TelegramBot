@@ -5,7 +5,7 @@ import random
 import asyncio
 from EasyGameLoader import bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from SomeKeyboards import next, end_menu, attack_menu, menu_keyboard, mob_next
+from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb
 
 
 
@@ -100,12 +100,12 @@ class Character(Unit):
         self.check_alive()
         villian.check_alive()
         if not self.alive:
-            await message.answer(text=random.choice(self.dead_quotes), reply_markup=next())
+            await message.answer(text=random.choice(self.dead_quotes), reply_markup=next_keyb)
             return None
 
         if not villian.alive:
             await message.answer(text=f"Вы опускаете свой меч, опомнившись от ярости", parse_mode="HTML",
-                                 reply_markup=ReplyKeyboardMarkup(keyboard=end_menu()))
+                                 reply_markup=ReplyKeyboardMarkup(keyboard=end_menu_keyb))
             return None
 
         hero_init = double_dices() + self.initiative
@@ -156,8 +156,7 @@ class Character(Unit):
                     await bot.send_message(chat_id=player, text=f"{self.name} наносит последний удар")
                     if villian.quoteIndex is not None:
                         await bot.send_message(chat_id=player, text=villian.dead_quotes[villian.quoteIndex])
-                    menu = end_menu()
-                    await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML", reply_markup=menu)
+                    await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML", reply_markup=end_menu_keyb)
 
         else:
             text.append(f"Вы промахиваетесь")
@@ -236,11 +235,10 @@ class Character(Unit):
             await message.answer(text="\n".join(text), parse_mode="HTML")
             mob.check_alive()
             if not mob.alive:
-                menu = mob_next()
                 if mob.quoteIndex is not None:
-                    await message.answer(text=mob.dead_quotes[mob.quoteIndex], reply_markup=menu)
+                    await message.answer(text=mob.dead_quotes[mob.quoteIndex], reply_markup=mob_next_keyb)
                 else:
-                    await message.answer(text=random.choice(mob.dead_quotes), reply_markup=menu)
+                    await message.answer(text=random.choice(mob.dead_quotes), reply_markup=mob_next_keyb)
                 mob_fighters[message.chat.id]['death_mobs'] += 1
         else:
             text.append(f"Вы промахиваетесь")
@@ -318,7 +316,7 @@ class Character(Unit):
                 self.check_alive()
                 if not self.alive:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp\n"
-                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=next())
+                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=next_keyb)
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
                 return False

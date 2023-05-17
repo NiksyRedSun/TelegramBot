@@ -18,7 +18,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from Functions import check_all_team, fight_presentantion, give_villian
-from SomeKeyboards import menu_keyboard, attack_menu
+from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb
 from SomeAttributes import current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over
 from SomeStates import GameState
 from EasyGameLoader import dp, bot
@@ -95,13 +95,13 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
             boss_fight_team[message.chat.id] = players_dict[message.chat.id]
         await message.answer(text=villian.presentation())
         await GameState.bossFight.set()
-        await message.answer(text="Вы уже в бою", reply_markup=attack_menu())
+        await message.answer(text="Вы уже в бою", reply_markup=attack_menu_keyb)
     elif message.text == "Отказаться от затеи":
         await GameState.menuState.set()
-        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
+        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
     else:
         if boss_fight_is_over:
-            await message.answer(text="Предыдущая сессия боя с боссом еще не окончена, предложите всем игрокам выйти", reply_markup=next())
+            await message.answer(text="Предыдущая сессия боя с боссом еще не окончена, предложите всем игрокам выйти", reply_markup=next_keyb)
             await GameState.menuState.set()
         else:
             menu = ReplyKeyboardMarkup(
@@ -117,7 +117,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
 
     if not char.alive:
         await fight_presentantion(char, villian, message)
-        await message.answer(text="Вы мертвы", reply_markup=next())
+        await message.answer(text="Вы мертвы", reply_markup=next_keyb)
         await GameState.deadState.set()
         current_boss_fight_team.pop(message.chat.id, None)
     else:
@@ -130,18 +130,18 @@ async def boss_fight(message: types.Message, state: FSMContext):
                 boss_fight_team.pop(message.chat.id, None)
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameState.menuState.set()
-                await message.answer(text="Все и так уже закончилось", reply_markup=menu_keyboard())
+                await message.answer(text="Все и так уже закончилось", reply_markup=menu_keyb)
             if await char.leave_boss_fight(current_boss_fight_team, villian, bot, message) and not boss_fight_is_over:
                 boss_fight_team.pop(message.chat.id, None)
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameState.menuState.set()
-                await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=menu_keyboard())
+                await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=menu_keyb)
 
         elif message.text == "Закончить":
             if boss_fight_is_over:
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameState.menuState.set()
-                await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
+                await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
 
         else:
             pass

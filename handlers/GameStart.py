@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from Functions import charChoosing
-from SomeKeyboards import menu_keyboard, attack_menu
+from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameState
 from EasyGameLoader import dp
@@ -84,10 +84,10 @@ async def villiage(message: types.Message, state: FSMContext):
         return None
     if message.text == "Бой с боссом":
         await GameState.preBossFight.set()
-        await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next())
+        await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next_keyb)
     elif message.text == "Бой с мобом":
         await GameState.preMobFight.set()
-        await message.answer(text=f"Попробуйте себя в очищении мира от мобов", reply_markup=next())
+        await message.answer(text=f"Попробуйте себя в очищении мира от мобов", reply_markup=next_keyb)
     elif message.text == "Фонтан":
         await char.fountain_healing(random.randint(1, 6), message)
     elif message.text == "Персонаж":
@@ -109,4 +109,4 @@ async def villiage(message: types.Message, state: FSMContext):
                                   f"Вы и ваши друзья честны друг с другом, поэтому называете это место деревней.\n"
                                   f"Для вас все начинается здесь.\n"
                                   f"Длинных путешествий не ждите, в основном всё будет происходить неподалеку.",
-                             reply_markup=menu_keyboard())
+                             reply_markup=menu_keyb)

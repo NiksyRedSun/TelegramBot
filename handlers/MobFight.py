@@ -6,8 +6,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from aiogram.dispatcher.storage import FSMContext
 from SomeStates import GameState
 from EasyGameLoader import dp
-from Functions import menu_keyboard, give_mobs, give_mobs_links, attack_menu, mob_fight_presentantion
-from SomeKeyboards import next, end_menu, attack_menu, menu_keyboard, mob_next, mob_fight_menu
+from Functions import give_mobs, give_mobs_links, mob_fight_presentantion
+from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb, mob_fight_menu_keyb
 from SomeAttributes import players_dict, mob_fight_dict
 from RateLimit import rate_limit, ThrottlingMiddleware
 import asyncio
@@ -43,9 +43,9 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
         await message.answer(text='\n'.join(give_mobs()))
     elif message.text == "Вернуться в деревню":
         await GameState.menuState.set()
-        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
+        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
     else:
-        await message.answer(text="Выбираете противника и в бой", reply_markup=mob_fight_menu())
+        await message.answer(text="Выбираете противника и в бой", reply_markup=mob_fight_menu_keyb)
 
 
 
@@ -56,17 +56,17 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
         mob_fight_dict[message.chat.id]["mob"] = give_mobs(mob_link)
         mob = mob_fight_dict[message.chat.id]["mob"]
         await GameState.mobFight.set()
-        await message.answer(text="Вы уже в бою", reply_markup=attack_menu())
+        await message.answer(text="Вы уже в бою", reply_markup=attack_menu_keyb)
         mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(mob, message))
         mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
 
     elif message.text == "Вернуться в деревню":
         await GameState.menuState.set()
         await message.answer(text=f"Вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов")
-        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyboard())
+        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
         mob_fight_dict.pop(message.chat.id, None)
     else:
-        await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu())
+        await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
         await message.answer(text='\n'.join(give_mobs()))
 
 
@@ -79,8 +79,8 @@ async def boss_fight(message: types.Message, state: FSMContext):
 
     if not char.alive:
         await mob_fight_presentantion(char, mob, message)
-        await message.answer(text="Вы мертвы", reply_markup=next())
-        await message.answer(text=f"Прежде чем умереть, вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов", reply_markup=next())
+        await message.answer(text="Вы мертвы", reply_markup=next_keyb)
+        await message.answer(text=f"Прежде чем умереть, вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов", reply_markup=next_keyb)
         await GameState.deadState.set()
         mob_fight_dict[message.chat.id]["mob_task"].cancel()
         mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
@@ -94,17 +94,17 @@ async def boss_fight(message: types.Message, state: FSMContext):
                 await GameState.mobChoosing.set()
                 mob_fight_dict[message.chat.id]["mob_task"].cancel()
                 mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
-                await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=next())
+                await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=next_keyb)
 
         elif message.text == "Продолжить убивать" and not mob.alive:
-            await message.answer(text="Вы уже в бою", reply_markup=attack_menu())
+            await message.answer(text="Вы уже в бою", reply_markup=attack_menu_keyb)
             mob_fight_dict[message.chat.id]["mob"].reset()
             mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(mob, message))
             mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
 
         elif message.text == "К выбору моба" and not mob.alive:
             await GameState.mobChoosing.set()
-            await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu())
+            await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
             await message.answer(text='\n'.join(give_mobs()))
 
 

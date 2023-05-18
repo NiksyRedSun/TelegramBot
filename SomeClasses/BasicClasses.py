@@ -14,11 +14,11 @@ def dice():
 
 
 class Unit:
-    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
+    def __init__(self, s_name: str, s_story: str, s_max_hp: int, s_attack: int, s_defense: int, s_initiative: int):
         self.name = s_name
         self.story = s_story
-        self.hp = s_hp
-        self.max_hp = self.hp
+        self.hp = s_max_hp
+        self.max_hp = s_max_hp
         self.attack = s_attack
         self.defense = s_defense
         self.initiative = s_initiative

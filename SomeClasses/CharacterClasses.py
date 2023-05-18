@@ -11,12 +11,12 @@ from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb,
 
 
 class Character(Unit):
-    def __init__(self, s_name: str, s_story: str, s_hp: int, s_attack: int, s_defense: int, s_initiative: int):
-        super().__init__(s_name, s_story, s_hp, s_attack, s_defense, s_initiative)
-        self.money = 0
-        self.level = 1
-        self.exp = 0
-        self.next_level_exp = 100
+    def __init__(self, s_name: str, s_story: str, s_max_hp: int, s_attack: int, s_defense: int, s_initiative: int, s_money=0, s_level=0, s_exp=0, s_next_lvl_exp=100):
+        super().__init__(s_name, s_story, s_max_hp, s_attack, s_defense, s_initiative)
+        self.money = s_money
+        self.level = s_level
+        self.exp = s_exp
+        self.next_level_exp = s_next_lvl_exp
         self.in_attack = False
         self.dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
                       f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",

@@ -8,7 +8,7 @@ next_keyb = ReplyKeyboardMarkup(
 menu_keyb = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
               [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")], [KeyboardButton(text="Персонаж")],
-              [KeyboardButton(text="Фонтан")]], resize_keyboard=True)
+              [KeyboardButton(text="Фонтан"), KeyboardButton(text="Храм")]], resize_keyboard=True)
 
 
 attack_menu_keyb = ReplyKeyboardMarkup(
@@ -31,3 +31,12 @@ mob_next_keyb = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="Продолжить убивать")], [KeyboardButton(text="К выбору моба")]],
     resize_keyboard=True)
 
+start_keyb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Старт")], [KeyboardButton(text="Есть персонаж")]], resize_keyboard=True, one_time_keyboard=True)
+
+vil_keyb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="В деревню")]], resize_keyboard=True)
+
+
+temple_keyb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Сохранить")], [KeyboardButton(text="Загрузить")], [KeyboardButton(text="В деревню")]], resize_keyboard=True)

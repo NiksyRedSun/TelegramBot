@@ -227,14 +227,14 @@ class Character(Unit):
                     text = critical_hit_text(text, critical_hit)
 
                 if critical_hit:
-                    for player in players:
+                    for player in players.copy():
                         if message.chat.id != player:
                             await bot.send_message(chat_id=player, text=critical_hit_quotes_team[quoteIndex], parse_mode="HTML")
 
             await message.answer(text="\n".join(text), parse_mode="HTML")
             villian.check_alive()
             if not villian.alive:
-                for player in players:
+                for player in players.copy():
                     await bot.send_message(chat_id=player, text=f"{self.name} наносит последний удар")
                     if villian.quoteIndex is not None:
                         await bot.send_message(chat_id=player, text=villian.dead_quotes[villian.quoteIndex])
@@ -346,7 +346,7 @@ class Character(Unit):
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init - villian_init > 2:
-            for player in players:
+            for player in players.copy():
                 if message.chat.id != player:
                     await bot.send_message(chat_id=player, text=f"{self.name} удачно соскочил с битвы", parse_mode="HTML")
             return True
@@ -354,7 +354,7 @@ class Character(Unit):
             init = dice()
             if init > 3:
                 await message.answer(text="У вас не получилось соскочить с битвы")
-                for player in players:
+                for player in players.copy():
                     if message.chat.id != player:
                         await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, но облажался",
                                            parse_mode="HTML")
@@ -367,13 +367,13 @@ class Character(Unit):
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp\n"
                                               f"Спешу сообщить, что этот удар был для вас последним", reply_markup=ReplyKeyboardMarkup(
                     keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
-                    for player in players:
+                    for player in players.copy():
                         if message.chat.id != player:
                             await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, мало того что получил ударом в спину, так еще и отъехал",
                                                parse_mode="HTML")
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
-                    for player in players:
+                    for player in players.copy():
                         if message.chat.id != player:
                             await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, но {villian.name} был инициативнее и снёс герою {damage} ударом в спину",
                                                parse_mode="HTML")

@@ -18,7 +18,7 @@ class Villian(Unit):
 
     def fight_presentation(self):
         pres_name = "+" + self.name.center(22, "-") + "+"
-        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(40)]
+        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(35)]
         return '\n'.join(text)
 
     def reset(self):
@@ -27,7 +27,7 @@ class Villian(Unit):
     async def boss_money_exp_dealing(self, all_players: dict, players: dict, bot):
         cur_money = int(self.money / len(all_players))
         cur_exp = int(self.exp / len(all_players))
-        text = [ "<code>+" + "Результаты".center(28, "-") + "+</code>",
+        text = ["<code>+" + "Результаты".center(28, "-") + "+</code>",
                 "<b><code>" + "Рейд-босс мертв".center(30, " ") + "</code></b>\n",
                 "Урон игроков:"]
 
@@ -111,7 +111,9 @@ class DragonVillian(Villian):
                         text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
-                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>\n")
+                    else:
+                        text.append("")
             else:
                 text.append(pos_quotes[self.quoteIndex])
 
@@ -192,7 +194,9 @@ class SpiderVillian(Villian):
                         text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
-                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>\n")
+                    else:
+                        text.append("")
             else:
                 text.append(pos_quotes[self.quoteIndex])
 
@@ -271,7 +275,9 @@ class GolemVillian(Villian):
                         text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
-                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>\n")
+                    else:
+                        text.append("")
             else:
                 text.append(pos_quotes[self.quoteIndex])
 
@@ -351,7 +357,9 @@ class TreeVillian(Villian):
                         text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
-                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>\n")
+                    else:
+                        text.append("")
             else:
                 text.append(pos_quotes[self.quoteIndex])
 
@@ -427,7 +435,9 @@ class WyvernVillian(Villian):
                         text.append(neg_quotes[self.quoteIndex])
                     char.check_alive()
                     if not char.alive:
-                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>")
+                        text.append(f"<b>{char.name} отъезжает в ходе битвы</b>\n")
+                    else:
+                        text.append("")
             else:
                 text.append(pos_quotes[self.quoteIndex])
 

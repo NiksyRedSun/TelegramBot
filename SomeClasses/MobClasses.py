@@ -20,8 +20,8 @@ class Mob(Unit):
         return '\n'.join(text)
 
     def fight_presentation(self):
-        pres_name = "+" + self.name.center(29, "-") + "+"
-        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(54)]
+        pres_name = "+" + self.name.center(22, "-") + "+"
+        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(40)]
         return '\n'.join(text)
 
 
@@ -38,7 +38,7 @@ class Mob(Unit):
 
 class SceletonMob(Mob):
     def __init__(self):
-        self.name = "Скелет обыкновенный"
+        self.name = "Скелет"
         self.story = "Можно разобрать парочку таких, чисто для разминки"
         self.hp = 30
         self.max_hp = self.hp
@@ -122,7 +122,7 @@ class LittleDragonMob(Mob):
         self.exp = random.randint(200, 450)
         self.link = "/LittleDragonMob"
         self.quoteIndex = 0
-        self.dead_quotes = [f"{self.name} от вашего удара роняет голову",
+        self.dead_quotes = [f"{self.name} от вашего попадания роняет голову",
                             f"{self.name} вопит еще в течение 3х секунд, прежде чем отдать концы",
                             f"{self.name} падает лапами вверх"]
 

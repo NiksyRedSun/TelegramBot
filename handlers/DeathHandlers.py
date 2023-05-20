@@ -18,17 +18,17 @@ from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from SomeKeyboards import next_keyb, menu_keyb, death_menu_keyb
 from SomeAttributes import players_dict
-from SomeStates import GameState
+from SomeStates import GameStates
 from EasyGameLoader import dp
 
 
 
-@dp.message_handler(state=GameState.deadState)
+@dp.message_handler(state=GameStates.deadState)
 async def after_choice(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
     if message.text == "Вернуться":
         await message.answer(text="Вас восстанавливает", reply_markup=menu_keyb)
-        await GameState.menuState.set()
+        await GameStates.menuState.set()
         char.ressurecting()
     elif message.text == "Персонаж":
         text = players_dict[message.chat.id].presentation()

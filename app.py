@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from SomeAttributes import current_boss_fight_team
-from SomeStates import GameState
+from SomeStates import GameStates
 from EasyGameLoader import dp, bot
 import handlers
 import time

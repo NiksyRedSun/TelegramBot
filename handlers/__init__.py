@@ -6,4 +6,5 @@ from . import Inventory
 from . import DeathHandlers
 from . import Menu
 from . import Temple
+from . import Person
 

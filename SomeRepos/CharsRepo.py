@@ -17,7 +17,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from SomeClasses.CharacterClasses import Character
-from SomeStates import GameState
+from SomeStates import GameStates
 import time
 
 
@@ -40,9 +40,9 @@ def post_char(id: int, char: Character):
     try:
         with con:
             cur = con.cursor()
-            cur.execute("INSERT INTO Characters (id, name, story, hp, attack, defense, initiative, money, level, exp, next_level_exp)"
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, char.name, char.story, char.max_hp, char.attack,
-                                                                     char.defense, char.initiative, char.money, char.level, char.exp, char.next_level_exp))
+            cur.execute("INSERT INTO Characters (id, name, story, hp, attack, defense, initiative, points, money, level, exp, next_level_exp)"
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, char.name, char.story, char.max_hp, char.attack,
+                                                                     char.defense, char.initiative, char.points, char.money, char.level, char.exp, char.next_level_exp))
             con.commit()
             return "Ваш персонаж успешно сохранен"
     except:
@@ -54,9 +54,9 @@ def post_char(id: int, char: Character):
 def put_char(id: int, char: Character):
     with con:
         cur = con.cursor()
-        cur.execute("UPDATE Characters SET name=?, story=?, hp=?, attack=?, defense=?, initiative=?, money=?, level=?, exp=?, next_level_exp=?"
+        cur.execute("UPDATE Characters SET name=?, story=?, hp=?, attack=?, defense=?, initiative=?, points=?, money=?, level=?, exp=?, next_level_exp=?"
                     "WHERE id=?", (char.name, char.story, char.hp, char.attack,
-                                                                 char.defense, char.initiative, char.money, char.level, char.exp, char.next_level_exp, id))
+                                                                 char.defense, char.initiative, char.points, char.money, char.level, char.exp, char.next_level_exp, id))
         con.commit()
 
 

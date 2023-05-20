@@ -17,30 +17,30 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from Functions import charChoosing
-from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, start_keyb, vil_keyb
+from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, start_keyb, to_vil_keyb
 from SomeAttributes import players_dict, current_boss_fight_team
-from SomeStates import GameState
+from SomeStates import GameStates
 from EasyGameLoader import dp
 from SomeRepos.CharsRepo import get_char, delete_char, post_char
 
 
 
-@dp.message_handler(state=GameState.templeState)
-async def villiage(message: types.Message, state: FSMContext):
+@dp.message_handler(state=GameStates.templeState)
+async def temple(message: types.Message, state: FSMContext):
     if message.text == "Сохранить":
         char = players_dict[message.chat.id]
         delete_char(message.chat.id)
         await message.answer(text=post_char(message.chat.id, char))
     elif message.text == "Загрузить":
-        char = get_char(message.chat.id)
-        if char is not None:
+        try:
+            char = get_char(message.chat.id)
             players_dict[message.chat.id] = char
             await message.answer(text=f"Ваш персонаж {char.name} успешно загружен")
-        else:
+        except:
             await message.answer(text=f"Ваш id не найден в базе данных. Для повторной попытки нажмите на кнопку еще раз")
     elif message.text == "В деревню":
-        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=vil_keyb, parse_mode="HTML")
-        await GameState.menuState.set()
+        await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb, parse_mode="HTML")
+        await GameStates.menuState.set()
     else:
         await message.answer(text=f"Храм позволяет сохранить или загрузить игру, сохранить можно только одного персонажа")
 

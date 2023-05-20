@@ -17,8 +17,8 @@ class Villian(Unit):
         return '\n'.join(text)
 
     def fight_presentation(self):
-        pres_name = "+" + self.name.center(29, "-") + "+"
-        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(54)]
+        pres_name = "+" + self.name.center(22, "-") + "+"
+        text = [f"<code>{pres_name}</code>", f"Здоровье: {self.hp}/{self.max_hp}".center(40)]
         return '\n'.join(text)
 
     def reset(self):
@@ -27,8 +27,8 @@ class Villian(Unit):
     async def boss_money_exp_dealing(self, all_players: dict, players: dict, bot):
         cur_money = int(self.money / len(all_players))
         cur_exp = int(self.exp / len(all_players))
-        text = [ "<code>+" + "Результаты".center(32, "-") + "+</code>",
-                "<b><code>" + "Рейд-босс мертв".center(34, " ") + "</code></b>\n",
+        text = [ "<code>+" + "Результаты".center(28, "-") + "+</code>",
+                "<b><code>" + "Рейд-босс мертв".center(30, " ") + "</code></b>\n",
                 "Урон игроков:"]
 
         for id in sorted(players.items(), key=lambda x: x[1]["damage"], reverse=True):
@@ -394,7 +394,7 @@ class WyvernVillian(Villian):
         self.money = random.randint(1000, 1800)
         self.exp = random.randint(1200, 1800)
         self.quoteIndex = 0
-        self.dead_quotes = [f"{self.name} роняет своё жало",
+        self.dead_quotes = [f"Виверна роняет своё жало",
                       f"Пикирование виверны переходит в падение",
                       f"Из пасти Виверны вырывается кровь, орошая поле боя"]
 

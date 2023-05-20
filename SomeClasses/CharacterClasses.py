@@ -11,8 +11,10 @@ from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb,
 
 
 class Character(Unit):
-    def __init__(self, s_name: str, s_story: str, s_max_hp: int, s_attack: int, s_defense: int, s_initiative: int, s_money=0, s_level=0, s_exp=0, s_next_lvl_exp=100):
+    def __init__(self, s_name: str, s_story: str, s_max_hp=5, s_attack=0, s_defense=0, s_initiative=0,
+                 s_points=30, s_money=0, s_level=0, s_exp=0, s_next_lvl_exp=100):
         super().__init__(s_name, s_story, s_max_hp, s_attack, s_defense, s_initiative)
+        self.points = s_points
         self.money = s_money
         self.level = s_level
         self.exp = s_exp
@@ -28,38 +30,53 @@ class Character(Unit):
 
     def presentation(self):
 
+        def make_short_string(string: str, long: int):
+            result = ' '
+            word_list = string.split()
+            count = 0
+            for i in word_list:
+                if count + len(i) > long:
+                    result += '\n '
+                    count = 0
+                result += i + " "
+                count += len(i)
+            return result
+
+
         def str_to_deathstr(string: str):
             new_string = map(lambda x: '/', string)
             return ''.join(new_string)
 
-        pres_name = "<code>" + "+" + self.name.center(30, "-") + "+" + "</code>"
-        pres_level = "<code>" + "+" + ("Уровень: " + str(self.level)).center(30, "-") + "+" + "</code>"
+        pres_name = "<code>" + "+" + self.name.center(28, "-") + "+" + "</code>"
+        pres_level = "<code>" + "+" + ("Уровень: " + str(self.level)).center(28, "-") + "+" + "</code>"
         text = [
                 f"{pres_name}",
-                f" {self.story}",
+                make_short_string(self.story, 26),
+                f"",
                 f" <code>Здоровье: ".ljust(20) + f"{self.hp}/{self.max_hp}</code>",
                 f" <code>Атака: ".ljust(20) + f"{self.attack}</code>",
                 f" <code>Защита: ".ljust(20) + f"{self.defense}</code>",
                 f" <code>Ловкость: ".ljust(20) + f"{self.initiative}</code>",
                 f" <code>Золото: ".ljust(20) + f"{self.money}</code>",
                 f" <code>Опыт: ".ljust(20) + f"{self.exp}/{self.next_level_exp}</code>",
+                f"",
                 f"{pres_level}"
                 ]
         if self.alive:
             return '\n'.join(text)
         else:
-            pres_name = "<code>+" + ("Дух " + self.name).center(30, "-") + "+</code>"
-            text = [str_to_deathstr(text[i]) if i != 2 else text[i] for i in range(len(text))]
+            pres_name = "<code>+" + ("Дух " + self.name).center(28, "-") + "+</code>"
+            text = [str_to_deathstr(text[i]) if i != 3 else text[i] for i in range(len(text))]
             text[0] = pres_name
             return '\n'.join(text)
 
 
 
     def fight_presentation(self):
-        pres_name = "+" + self.name.center(29, "-") + "+"
+        pres_name = "+" + self.name.center(22, "-") + "+"
         text = [
                 f"<code>{pres_name}</code>",
-                f"Здоровье: {self.hp}/{self.max_hp}".center(54)]
+                f"Здоровье: {self.hp}/{self.max_hp}".center(40)]
                 # f"Атака: {self.attack}",
                 # f"Защита: {self.defense}",
                 # f"Инициатива: {self.initiative}"]
@@ -74,16 +91,59 @@ class Character(Unit):
                 self.next_level_exp = int(100 * (1.85 - (self.level*0.01)) ** self.level)
             self.level += 1
             if self.level % 2 == 0:
-                self.max_hp += 3
-            if self.level % 3 == 0:
-                self.attack += 1
-                self.defense += 1
-            if self.level % 4 == 0:
-                self.initiative += 1
+                self.points += 1
             self.hp = self.max_hp
 
 
+    def points_distr(self, skill: str):
+        match skill:
+            case "attack":
+                if self.points > 0:
+                    self.points -= 1
+                    self.attack += 1
+                    return "Вы увеличили атаку на 1 единицу"
+                else:
+                    return "Вам не хватает очков умений"
+            case "defense":
+                if self.points > 0:
+                    self.points -= 1
+                    self.defense += 1
+                    return "Вы увеличили защиту на 1 единицу"
+                else:
+                    return "Вам не хватает очков умений"
+            case "initiative":
+                if self.points >= 3:
+                    self.points -= 3
+                    self.initiative += 1
+                    return "Вы увеличили ловкость на 1 единицу"
+                else:
+                    return "Вам не хватает очков умений"
+            case "hp":
+                if self.points > 0:
+                    self.points -= 1
+                    self.max_hp += 5
+                    return "Вы увеличили здоровье на 5 единиц"
+                else:
+                    return "Вам не хватает очков умений"
+            case "reload":
+                    self.points += int((self.max_hp - 5)/5 + self.attack + self.defense + self.initiative*3)
+                    self.max_hp = 5
+                    self.hp = 5
+                    self.attack = 0
+                    self.defense = 0
+                    self.initiative = 0
+                    return f"Вы обнулили очки умений\nКоличество очков умений теперь: {self.points} "
+
+
+
     async def attack_boss_func(self, villian: Villian, message, bot, players):
+
+        def critical_hit_text(text: list, crit: bool):
+            if crit:
+                text.insert(0, "<b>КРИТИЧЕСКИЙ УДАР</b>")
+                text.append("<b>КРИТИЧЕСКИЙ УДАР</b>")
+            return text
+
         quoteIndex = random.randint(0, 5)
         quotes = [f"Вы замахиваетесь слева",
                   f"Вы замахиваетесь справа",
@@ -115,7 +175,6 @@ class Character(Unit):
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
                 hit_damage = int(self.attack * 2.5)
-                text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
                 critical_hit = True
             else:
                 hit_damage = self.attack
@@ -141,14 +200,37 @@ class Character(Unit):
                           f"Колящим ударом ваш меч заходит противнику в грудную клетку на 10 см оставляя там {damage} урона",
                           f"Ваш удар протыкает нижнюю конечность противника насквозь, при выемке меча противник теряет {damage} hp"]
 
+
+                critical_hit_quotes_team = [f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
+                                            f"{self.name} залетает в грудную клетку противника сбоку снося {damage} hp",
+                                            f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
+                                            f"{self.name} срезает противнику кусок тела нанеся {damage} урона",
+                                            f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
+                                            f"{self.name} попадает противнику в анатомические ключицы и сносит {damage} урона",
+                                            f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
+                                            f"{self.name} наносит глубокий рубящий удар в нижнюю конечность снимая противнику {damage} hp",
+                                            f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
+                                            f"{self.name} протыкает противнику грудную клетку снося {damage} hp",
+                                            f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
+                                            f"{self.name} протыкает противнику нижнюю конечность насквозь на {damage} урона",
+                                            ]
+
                 villian.hp -= damage
+
                 if critical_hit:
                     text.append(critical_hit_quotes[quoteIndex])
                 else:
                     text.append(hit_quotes[quoteIndex])
                 players[message.chat.id]["damage"] += damage
+
                 if critical_hit:
-                    text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
+                    text = critical_hit_text(text, critical_hit)
+
+                if critical_hit:
+                    for player in players:
+                        if message.chat.id != player:
+                            await bot.send_message(chat_id=player, text=critical_hit_quotes_team[quoteIndex], parse_mode="HTML")
+
             await message.answer(text="\n".join(text), parse_mode="HTML")
             villian.check_alive()
             if not villian.alive:
@@ -258,7 +340,6 @@ class Character(Unit):
         else:
             self.hp = self.max_hp
             await message.answer(text=f"Фонтан залечил каждую рану на вашем теле")
-
 
 
     async def leave_boss_fight(self, players: dict, villian, bot, message):

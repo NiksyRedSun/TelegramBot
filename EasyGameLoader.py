@@ -15,7 +15,7 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
-from SomeStates import GameState
+from SomeStates import GameStates
 
 
 dotenv.load_dotenv()

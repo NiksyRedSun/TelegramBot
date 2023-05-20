@@ -32,11 +32,22 @@ mob_next_keyb = ReplyKeyboardMarkup(
     resize_keyboard=True)
 
 start_keyb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Старт")], [KeyboardButton(text="Есть персонаж")]], resize_keyboard=True, one_time_keyboard=True)
+        keyboard=[[KeyboardButton(text="Начать")], [KeyboardButton(text="Есть персонаж")]], resize_keyboard=True, one_time_keyboard=True)
 
-vil_keyb = ReplyKeyboardMarkup(
+to_vil_keyb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="В деревню")]], resize_keyboard=True)
 
 
 temple_keyb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Сохранить")], [KeyboardButton(text="Загрузить")], [KeyboardButton(text="В деревню")]], resize_keyboard=True)
+
+person_keyb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Изменить имя"), KeyboardButton(text="Изменить описание")],
+                  [KeyboardButton(text="Очки умений"), KeyboardButton(text="Персонаж")],
+                  [KeyboardButton(text="В деревню")]], resize_keyboard=True)
+
+person_points_keyb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Атака"), KeyboardButton(text="Защита")],
+                  [KeyboardButton(text="Ловкость"), KeyboardButton(text="Здоровье")],
+                  [KeyboardButton(text="Перераспределить очки")],
+                  [KeyboardButton(text="Вернуться")]], resize_keyboard=True)

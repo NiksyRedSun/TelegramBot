@@ -25,21 +25,25 @@ def check_all_team(players: dict):
         return "Alive"
 
 
+async def show_players(players: dict, message):
+    pass
+
+
 
 def charChoosing(text):
     match text:
         case "/pirate":
-            return Character("Черная борода", "Как вы уже догадались, вы пират", 45, 5, 3, 4)
+            return Character("Черная борода", "Как вы уже догадались, вы пират", 45, 5, 3, 4)#29
         case "/tatarin":
-            return Character("Айзулбек", "Вы тут за татарина с луком", 25, 8, 3, 4)
+            return Character("Айзулбек", "Вы тут за татарина с луком", 25, 8, 3, 4)#28
         case "/viking":
-            return Character("Сигурд", "Вы тут за викинга, вам ничего\n не остается кроме как махать\n мечом", 60, 10, 4, 2)
+            return Character("Сигурд", "Вы тут за викинга, вам ничего\n не остается кроме как махать\n мечом", 55, 10, 4, 2)#31
         case "/elf":
-            return Character("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 1, 6)
+            return Character("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 1, 6)#31
         case "/khajiit":
-            return Character("Рисаад", "Опция для тех, кто хочет играть за каджита", 30, 7, 1, 5)
+            return Character("Рисаад", "Опция для тех, кто хочет играть за каджита", 30, 7, 1, 5)#29
         case "/gnom":
-            return Character("Эдукан", "Никакой команде не обойтись без\n гнома, на вас - размахивать\n топором", 50, 8, 4, 3)
+            return Character("Эдукан", "Никакой команде не обойтись без\n гнома, на вас - размахивать\n топором", 50, 8, 4, 3)#31
         case "/testChar":
             return Character("SomePers", "Используем этого перса для тестирования", 1000, 100, 100, 100)
 
@@ -69,6 +73,7 @@ async def mob_fight_presentantion(char, mob, message):
             await message.answer(text=line, reply_markup=mob_next_keyb, parse_mode="HTML")
         else:
             await message.answer(text=line, reply_markup=next_keyb, parse_mode="HTML")
+
 
 def give_villian():
     return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian()])

@@ -20,6 +20,7 @@ class Character(Unit):
         self.exp = s_exp
         self.next_level_exp = s_next_lvl_exp
         self.quoteIndex = None
+        self.in_dead_quote = None
         self.dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
                       f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",
                       f"Ваши внутренности выпадывают наружу, приключение больше не кажется интересным",
@@ -136,10 +137,10 @@ class Character(Unit):
 
 
 
-    def critical_hit_text(self, text: list, crit: bool):
-        if crit:
-            text.insert(0, "<b>КРИТИЧЕСКИЙ УДАР</b>")
-            text.append("<b>КРИТИЧЕСКИЙ УДАР</b>")
+
+    def critical_hit_text(self, text: list):
+        text.insert(0, "<b>" + "КРИТИЧЕСКИЙ УДАР".center(34, "*") + "</b>")
+        text.append("<b>" + "КРИТИЧЕСКИЙ УДАР".center(34, "*") + "</b>")
         return text
 
 
@@ -203,15 +204,15 @@ class Character(Unit):
 
 
                 critical_hit_quotes_team = [f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
-                                            f"{self.name} залетает в грудную клетку противника сбоку снося {damage} hp",
+                                            f"{self.name} залетает мечом в грудную клетку противника сбоку снося {damage} hp",
                                             f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
                                             f"{self.name} срезает противнику кусок тела нанеся {damage} урона",
                                             f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
-                                            f"{self.name} попадает противнику в анатомические ключицы и сносит {damage} урона",
+                                            f"{self.name} попадает противнику в анатомические ключицы и сносит противнику {damage} hp",
                                             f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
                                             f"{self.name} наносит глубокий рубящий удар в нижнюю конечность снимая противнику {damage} hp",
                                             f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
-                                            f"{self.name} протыкает противнику грудную клетку снося {damage} hp",
+                                            f"{self.name} протыкает грудную клетку снося  противнику {damage} hp",
                                             f"<b>КРИТИЧЕСКИЙ УДАР</b> by {self.name}\n"
                                             f"{self.name} протыкает противнику нижнюю конечность насквозь на {damage} урона",
                                             ]
@@ -225,7 +226,7 @@ class Character(Unit):
                 players[message.chat.id]["damage"] += damage
 
                 if critical_hit:
-                    text = self.critical_hit_text(text, critical_hit)
+                    text = self.critical_hit_text(text)
 
                 if critical_hit:
                     for player in players.copy():
@@ -315,7 +316,7 @@ class Character(Unit):
                     text.append(hit_quotes[self.quoteIndex])
 
                 if critical_hit:
-                    text = self.critical_hit_text(text, critical_hit)
+                    text = self.critical_hit_text(text)
 
             await message.answer(text="\n".join(text), parse_mode="HTML")
             mob.check_alive()
@@ -367,12 +368,11 @@ class Character(Unit):
                 self.hp -= damage
                 self.check_alive()
                 if not self.alive:
-                    await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp\n"
-                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=ReplyKeyboardMarkup(
+                    await message.answer(text=villian.give_in_dead_quotes_for_player(), reply_markup=ReplyKeyboardMarkup(
                     keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
                     for player in players.copy():
                         if message.chat.id != player:
-                            await bot.send_message(chat_id=player, text=f"{self.name} пытался соскочить с битвы, мало того что получил ударом в спину, так еще и отъехал",
+                            await bot.send_message(chat_id=player, text=villian.give_in_dead_quotes_for_team(self),
                                                parse_mode="HTML")
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {villian.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
@@ -399,8 +399,7 @@ class Character(Unit):
                 self.hp -= damage
                 self.check_alive()
                 if not self.alive:
-                    await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp\n"
-                                              f"Спешу сообщить, что этот удар был для вас последним", reply_markup=next_keyb)
+                    await message.answer(text=mob.give_in_dead_quotes_for_player(), reply_markup=next_keyb)
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
                 return False

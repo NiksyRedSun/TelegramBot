@@ -12,7 +12,6 @@ def dice():
     return random.randint(1, 6)
 
 
-
 class Unit:
     def __init__(self, s_name: str, s_story: str, s_max_hp: int, s_attack: int, s_defense: int, s_initiative: int):
         self.name = s_name
@@ -34,6 +33,8 @@ class Unit:
     def reset(self):
         self.alive = True
         self.hp = self.max_hp
+
+
 
 
 

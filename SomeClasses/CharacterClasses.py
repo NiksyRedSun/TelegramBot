@@ -19,7 +19,7 @@ class Character(Unit):
         self.level = s_level
         self.exp = s_exp
         self.next_level_exp = s_next_lvl_exp
-        self.in_attack = False
+        self.quoteIndex = None
         self.dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
                       f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",
                       f"Ваши внутренности выпадывают наружу, приключение больше не кажется интересным",
@@ -88,7 +88,7 @@ class Character(Unit):
             if self.level < 8:
                 self.next_level_exp = int(100 * 2 ** self.level)
             else:
-                self.next_level_exp = int(100 * (1.85 - (self.level*0.01)) ** self.level)
+                self.next_level_exp = int(100 * (1.85 - (self.level*0.04)) ** self.level)
             self.level += 1
             if self.level % 2 == 0:
                 self.points += 1
@@ -136,15 +136,16 @@ class Character(Unit):
 
 
 
+    def critical_hit_text(self, text: list, crit: bool):
+        if crit:
+            text.insert(0, "<b>КРИТИЧЕСКИЙ УДАР</b>")
+            text.append("<b>КРИТИЧЕСКИЙ УДАР</b>")
+        return text
+
+
     async def attack_boss_func(self, villian: Villian, message, bot, players):
 
-        def critical_hit_text(text: list, crit: bool):
-            if crit:
-                text.insert(0, "<b>КРИТИЧЕСКИЙ УДАР</b>")
-                text.append("<b>КРИТИЧЕСКИЙ УДАР</b>")
-            return text
-
-        quoteIndex = random.randint(0, 5)
+        self.quoteIndex = random.randint(0, 5)
         quotes = [f"Вы замахиваетесь слева",
                   f"Вы замахиваетесь справа",
                   f"Вы замахиваетесь для рубящего, нисходящего сверху удара",
@@ -154,7 +155,7 @@ class Character(Unit):
 
         critical_hit = False
         text = []
-        await message.answer(text=quotes[quoteIndex])
+        await message.answer(text=quotes[self.quoteIndex])
         await asyncio.sleep(0.7)
 
         self.check_alive()
@@ -218,18 +219,18 @@ class Character(Unit):
                 villian.hp -= damage
 
                 if critical_hit:
-                    text.append(critical_hit_quotes[quoteIndex])
+                    text.append(critical_hit_quotes[self.quoteIndex])
                 else:
-                    text.append(hit_quotes[quoteIndex])
+                    text.append(hit_quotes[self.quoteIndex])
                 players[message.chat.id]["damage"] += damage
 
                 if critical_hit:
-                    text = critical_hit_text(text, critical_hit)
+                    text = self.critical_hit_text(text, critical_hit)
 
                 if critical_hit:
                     for player in players.copy():
                         if message.chat.id != player:
-                            await bot.send_message(chat_id=player, text=critical_hit_quotes_team[quoteIndex], parse_mode="HTML")
+                            await bot.send_message(chat_id=player, text=critical_hit_quotes_team[self.quoteIndex], parse_mode="HTML")
 
             await message.answer(text="\n".join(text), parse_mode="HTML")
             villian.check_alive()
@@ -243,13 +244,13 @@ class Character(Unit):
         else:
             text.append(f"Вы промахиваетесь")
             await message.answer(text="\n".join(text), parse_mode="HTML")
+        self.quoteIndex = None
 
 
     async def attack_mob_func(self, mob: Mob, message, mob_fighters: dict):
         if not self.alive:
             return None
-        self.in_attack = True
-        quoteIndex = random.randint(0, 5)
+        self.quoteIndex = random.randint(0, 5)
         quotes = [f"Вы замахиваетесь слева",
                   f"Вы замахиваетесь справа",
                   f"Вы замахиваетесь для рубящего, нисходящего сверху удара",
@@ -259,14 +260,14 @@ class Character(Unit):
 
         critical_hit = False
         text = []
-        await message.answer(text=quotes[quoteIndex])
+        await message.answer(text=quotes[self.quoteIndex])
         await asyncio.sleep(0.7)
 
         self.check_alive()
         mob.check_alive()
 
         if not self.alive:
-            self.in_attack = False
+            self.quoteIndex = None
             return None
 
         if not mob.alive:
@@ -281,7 +282,6 @@ class Character(Unit):
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
                 hit_damage = int(self.attack * 2.5)
-                text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
                 critical_hit = True
             else:
                 hit_damage = self.attack
@@ -308,12 +308,15 @@ class Character(Unit):
                           f"Ваш удар протыкает нижнюю конечность противника насквозь, при выемке меча противник теряет {damage} hp"]
 
                 mob.hp -= damage
+
                 if critical_hit:
-                    text.append(critical_hit_quotes[quoteIndex])
+                    text.append(critical_hit_quotes[self.quoteIndex])
                 else:
-                    text.append(hit_quotes[quoteIndex])
+                    text.append(hit_quotes[self.quoteIndex])
+
                 if critical_hit:
-                    text.append(f"*<b>КРИТИЧЕСКИЙ УДАР</b>*")
+                    text = self.critical_hit_text(text, critical_hit)
+
             await message.answer(text="\n".join(text), parse_mode="HTML")
             mob.check_alive()
             if not mob.alive:
@@ -325,7 +328,7 @@ class Character(Unit):
         else:
             text.append(f"Вы промахиваетесь")
             await message.answer(text="\n".join(text), parse_mode="HTML")
-        self.in_attack = False
+        self.quoteIndex = None
 
 
     def ressurecting(self):

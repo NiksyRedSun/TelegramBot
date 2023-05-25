@@ -66,6 +66,8 @@ def boss_fight_reset():
     boss_fight_is_on = False
     boss_fight_is_over = False
     task1.cancel()
+    task2.cancel()
+    task3.cancel()
 
 
 
@@ -81,7 +83,7 @@ async def boss_attack():
 
 @dp.message_handler(state=GameStates.preBossFight)
 async def pre_boss_fight(message: types.Message, state: FSMContext):
-    global boss_fight_is_on, villian, task1
+    global boss_fight_is_on, villian, task1, task2, task3
     if message.text == "Начать бой с боссом":
         if not boss_fight_is_on:
             boss_fight_is_on = True

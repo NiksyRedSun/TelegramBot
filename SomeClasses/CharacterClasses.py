@@ -88,8 +88,10 @@ class Character(Unit):
         while self.exp > self.next_level_exp:
             if self.level < 8:
                 self.next_level_exp = int(100 * 2 ** self.level)
+            elif self.level < 11:
+                self.next_level_exp = int(100 * (1.85 - (self.level*0.0115)) ** self.level)
             else:
-                self.next_level_exp = int(100 * (1.85 - (self.level*0.04)) ** self.level)
+                self.next_level_exp += 10000 + 2500 * (12 - self.level)
             self.level += 1
             if self.level % 2 == 0:
                 self.points += 1

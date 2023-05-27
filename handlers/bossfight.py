@@ -119,9 +119,6 @@ async def boss_fight(message: types.Message, state: FSMContext):
 
     if not char.alive:
         await fight_presentantion(char, villian, message)
-        if char.in_dead_quote is None:
-            char.in_dead_quote = random.choice(char.sudden_death_quotes)
-            await message.answer(text=char.in_dead_quote)
         await message.answer(text="Вы мертвы", reply_markup=next_keyb)
         await DeathStates.deadState.set()
         current_boss_fight_team.pop(message.chat.id, None)

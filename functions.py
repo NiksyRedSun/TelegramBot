@@ -55,7 +55,10 @@ async def fight_presentantion(char, enemy, message):
     # line += "<code>" + "=" * 31 + "</code>" + "\n"
     line += enemy.fight_presentation()
     if enemy.alive:
-        await message.answer(text=line, reply_markup=attack_menu_keyb, parse_mode="HTML")
+        if char.alive:
+            await message.answer(text=line, reply_markup=attack_menu_keyb, parse_mode="HTML")
+        else:
+            await message.answer(text=line, reply_markup=next_keyb, parse_mode="HTML")
     else:
         await message.answer(text=line, reply_markup=end_menu_keyb, parse_mode="HTML")
 

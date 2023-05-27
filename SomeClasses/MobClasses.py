@@ -92,12 +92,16 @@ class Mob(Unit):
                 char.check_alive()
                 if not char.alive:
                     if char.quoteIndex is not None:
-                        await message.answer(text=char.dead_quotes[char.quoteIndex], reply_markup=next_keyb)
+                        char.in_dead_quote = char.dead_quotes[char.quoteIndex]
+                        await message.answer(text=char.in_dead_quote, reply_markup=next_keyb)
                     else:
-                        await message.answer(text=random.choice(self.char_killed_quotes), reply_markup=next_keyb)
+                        char.in_dead_quote = random.choice(self.char_killed_quotes)
+                        await message.answer(text=char.in_dead_quote, reply_markup=next_keyb)
         else:
             await message.answer(text=self.pos_quotes[self.quoteIndex])
         self.quoteIndex = None
+
+
 
 
 

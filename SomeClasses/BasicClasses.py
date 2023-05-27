@@ -37,6 +37,44 @@ class Unit:
 
 
 
+class DeathCounter:
+    def __init__(self, words: str):
+        self.word_list = []
+        word_list = list(map(lambda line: line.capitalize(), words.split()))
+        for word in word_list:
+            result_word = ''
+            trash_list = '.,!?'
+            for symbol in word:
+                if symbol not in trash_list:
+                    result_word += symbol
+            self.word_list.append(result_word)
+        self.len = len(self.word_list)
+        self.cur_ind = 0
+        self.good_words = 0
+
+
+    def __iter__(self):
+        return self
+
+
+    def __next__(self):
+        if self.cur_ind == self.len:
+            raise StopIteration
+        else:
+            self.cur_ind += 1
+            return self.word_list[self.cur_ind-1]
+
+
+    def check_word(self, word):
+        if word == self.word_list[self.cur_ind-1]:
+            self.good_words += 1
+
+
+    def check_words(self):
+        if self.good_words > self.len/1.5:
+            return True
+        else:
+            return False
 
 
 

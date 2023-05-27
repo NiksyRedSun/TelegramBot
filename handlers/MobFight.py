@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.builtin import CommandStart, CommandHelp, Text, 
 from aiogram.dispatcher.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from aiogram.dispatcher.storage import FSMContext
-from SomeStates import GameStates
+from SomeStates import GameStates, DeathStates
 from EasyGameLoader import dp
 from Functions import give_mobs, give_mobs_links, mob_fight_presentantion
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb, mob_fight_menu_keyb
@@ -81,7 +81,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
         await mob_fight_presentantion(char, mob, message)
         await message.answer(text="Вы мертвы", reply_markup=next_keyb)
         await message.answer(text=f"Прежде чем умереть, вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов", reply_markup=next_keyb)
-        await GameStates.deadState.set()
+        await DeathStates.deadState.set()
         mob_fight_dict[message.chat.id]["mob_task"].cancel()
         mob_fight_dict[message.chat.id]["mob_check_task"].cancel()
         mob_fight_dict.pop(message.chat.id, None)

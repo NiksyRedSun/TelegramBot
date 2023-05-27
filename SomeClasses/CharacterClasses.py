@@ -1,4 +1,4 @@
-from SomeClasses.BasicClasses import Unit, dice, double_dices
+from SomeClasses.BasicClasses import Unit, dice, double_dices, DeathCounter
 from SomeClasses.VillianClasses import Villian
 from SomeClasses.MobClasses import Mob
 import random
@@ -21,12 +21,17 @@ class Character(Unit):
         self.next_level_exp = s_next_lvl_exp
         self.quoteIndex = None
         self.in_dead_quote = None
+        self.deathCounter = None
         self.dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
                       f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",
                       f"Ваши внутренности выпадывают наружу, приключение больше не кажется интересным",
                       f"Ваше оружие падает, вы чувствуете как одежда начинает прилипать к телу из-за многочисленных источников кровотечения под ней. Вам стоило остаться дома",
                       f"Стоя на коленях и готовясь уйти лбом в землю, вы начинаете забывать о том как оказались здесь и медленно теряете сознание",
                       f"В последний раз взглянув на свои окровавленные руки, вы начинаете думать о том, была ли эта смерть славной. Вас погружает в вечный сон"]
+
+        self.sudden_death_quotes = ["Отсутствие сосредоточенности в момент битвы привело к тому, что вы даже близко не можете вспомнить, как образовалась глубокая кровоточащая дыра на передней поверхности грудной клетки",
+                                    "Совершненно очевидно, что во время боя не стоит считать ворон. То что вы оказались в канаве со сломанными ногами - закономерный процесс вашего отвлечения",
+                                    "Сосредоточение ключ к жизни. Жаль, что вы пришли к этому только сейчас, когда отвлечение привело вас к множественным переломам позвоночника и неспособностью пошевалить какой-угодно частью тела"]
 
 
     def presentation(self):
@@ -82,6 +87,10 @@ class Character(Unit):
                 # f"Защита: {self.defense}",
                 # f"Инициатива: {self.initiative}"]
         return '\n'.join(text)
+
+
+    def get_death_counter(self):
+        self.deathCounter = DeathCounter(self.in_dead_quote)
 
 
     def next_level(self):
@@ -164,7 +173,9 @@ class Character(Unit):
         self.check_alive()
         villian.check_alive()
         if not self.alive:
-            await message.answer(text=random.choice(self.dead_quotes), reply_markup=next_keyb)
+            self.quoteIndex = None
+            self.in_dead_quote = random.choice(self.dead_quotes)
+            await message.answer(text=self.in_dead_quote, reply_markup=next_keyb)
             return None
 
         if not villian.alive:
@@ -337,6 +348,8 @@ class Character(Unit):
     def ressurecting(self):
         self.hp = int(self.max_hp * random.random())
         self.alive = True
+        self.in_dead_quote = None
+        self.deathCounter = None
 
 
     async def fountain_healing(self, heal_hp, message):
@@ -370,7 +383,8 @@ class Character(Unit):
                 self.hp -= damage
                 self.check_alive()
                 if not self.alive:
-                    await message.answer(text=villian.give_in_dead_quotes_for_player(), reply_markup=ReplyKeyboardMarkup(
+                    self.in_dead_quote = villian.give_in_dead_quotes_for_player()
+                    await message.answer(text=self.in_dead_quote, reply_markup=ReplyKeyboardMarkup(
                     keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True))
                     for player in players.copy():
                         if message.chat.id != player:
@@ -401,7 +415,8 @@ class Character(Unit):
                 self.hp -= damage
                 self.check_alive()
                 if not self.alive:
-                    await message.answer(text=mob.give_in_dead_quotes_for_player(), reply_markup=next_keyb)
+                    self.in_dead_quote = mob.give_in_dead_quotes_for_player()
+                    await message.answer(text=self.in_dead_quote, reply_markup=next_keyb)
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
                 return False

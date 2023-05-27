@@ -4,6 +4,9 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 next_keyb = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="Продолжить")]], resize_keyboard=True)
 
+next_points_keyb = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Продолжить...")]], resize_keyboard=True)
+
 
 menu_keyb = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
@@ -20,7 +23,7 @@ end_menu_keyb = ReplyKeyboardMarkup(
 
 
 death_menu_keyb = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="Вернуться")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
+    keyboard=[[KeyboardButton(text="Попытаться вернуться")], [KeyboardButton(text="Персонаж")]], resize_keyboard=True)
 
 mob_fight_menu_keyb = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="Выбрать моба")], [KeyboardButton(text="Вернуться в деревню")]],

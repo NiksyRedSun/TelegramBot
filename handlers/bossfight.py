@@ -20,7 +20,7 @@ from RateLimit import rate_limit, ThrottlingMiddleware
 from Functions import check_all_team, fight_presentantion, give_villian
 from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb
 from SomeAttributes import current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over
-from SomeStates import GameStates
+from SomeStates import GameStates, DeathStates
 from EasyGameLoader import dp, bot
 from threading import Thread
 import time
@@ -119,8 +119,11 @@ async def boss_fight(message: types.Message, state: FSMContext):
 
     if not char.alive:
         await fight_presentantion(char, villian, message)
+        if char.in_dead_quote is None:
+            char.in_dead_quote = random.choice(char.sudden_death_quotes)
+            await message.answer(text=char.in_dead_quote)
         await message.answer(text="Вы мертвы", reply_markup=next_keyb)
-        await GameStates.deadState.set()
+        await DeathStates.deadState.set()
         current_boss_fight_team.pop(message.chat.id, None)
     else:
         if message.text == "Атаковать":

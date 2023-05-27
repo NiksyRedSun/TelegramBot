@@ -7,7 +7,6 @@ class GameStates(StatesGroup):
     preBossFight = State()
     bossFight = State()
 
-    deadState = State()
 
     preMobFight = State()
     mobFight = State()
@@ -26,3 +25,8 @@ class PersonStates(StatesGroup):
     nameChoice = State()
     descrChoice = State()
     personPoints = State()
+
+
+class DeathStates(StatesGroup):
+    deadState = State()
+    deadLeftState = State()

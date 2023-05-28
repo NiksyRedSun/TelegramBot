@@ -136,7 +136,7 @@ class Villian(Unit):
             char_init = double_dices() + char.initiative
 
             if villian_init > char_init:
-                damage = self.attack + dice() - char.defense
+                damage = self.attack + dice() - char.defense - int(char.fury * 0.05)
 
                 if damage <= 0:
                     text.append(self.give_pos_quotes(char))
@@ -200,7 +200,7 @@ class DragonVillian(Villian):
         self.initiative = 5
         self.alive = True
         self.money = random.randint(250, 1000)
-        self.exp = random.randint(850, 1350)
+        self.exp = random.randint(2500, 3500)
         self.quoteIndex = 0
 
         self.quotes = [f"{self.name} замахивается своим хвостом",
@@ -298,7 +298,7 @@ class SpiderVillian(Villian):
         self.initiative = 6
         self.alive = True
         self.money = random.randint(250, 1000)
-        self.exp = random.randint(850, 1350)
+        self.exp = random.randint(2750, 3750)
         self.quoteIndex = 0
 
         self.quotes = [f"{self.name} выстреливает сеткой из паутины",
@@ -391,7 +391,7 @@ class GolemVillian(Villian):
         self.initiative = 4
         self.alive = True
         self.money = random.randint(700, 1500)
-        self.exp = random.randint(1000, 1550)
+        self.exp = random.randint(4500, 5550)
         self.quoteIndex = 0
 
         self.quotes = [f"{self.name} замахивается кулаком-молотом",
@@ -483,7 +483,7 @@ class TreeVillian(Villian):
         self.initiative = 5
         self.alive = True
         self.money = random.randint(700, 1300)
-        self.exp = random.randint(1000, 1550)
+        self.exp = random.randint(4000, 4750)
         self.quoteIndex = 0
 
         self.quotes = [f"{self.name} замахивается ветками",
@@ -572,7 +572,7 @@ class WyvernVillian(Villian):
         self.initiative = 6
         self.alive = True
         self.money = random.randint(1000, 1800)
-        self.exp = random.randint(1200, 1800)
+        self.exp = random.randint(5000, 5790)
 
         self.quoteIndex = 0
 

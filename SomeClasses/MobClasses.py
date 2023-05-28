@@ -82,7 +82,7 @@ class Mob(Unit):
         villian_init = double_dices() + self.initiative
         char_init = double_dices() + char.initiative
         if villian_init > char_init:
-            damage = self.attack + dice() - char.defense
+            damage = self.attack + dice() - char.defense - int(char.fury * 0.05)
 
             if damage <= 0:
                 await message.answer(text=self.pos_quotes[self.quoteIndex])
@@ -175,7 +175,7 @@ class LittleDragonMob(Mob):
         self.initiative = 5
         self.alive = True
         self.money = random.randint(200, 450)
-        self.exp = random.randint(200, 450)
+        self.exp = random.randint(450, 750)
         self.link = "/LittleDragonMob"
         self.quoteIndex = None
 
@@ -231,7 +231,7 @@ class OrcMob(Mob):
         self.initiative = 6
         self.alive = True
         self.money = random.randint(400, 650)
-        self.exp = random.randint(400, 650)
+        self.exp = random.randint(750, 950)
         self.link = "/OrcMob"
         self.quoteIndex = None
 

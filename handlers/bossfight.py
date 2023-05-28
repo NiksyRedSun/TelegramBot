@@ -127,7 +127,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
             await char.attack_boss_func(villian, message, bot, current_boss_fight_team)
             await fight_presentantion(char, villian, message)
 
-        elif message.text == "Соскочить":
+        elif message.text == "Сбежать":
             if boss_fight_is_over:
                 boss_fight_team.pop(message.chat.id, None)
                 current_boss_fight_team.pop(message.chat.id, None)

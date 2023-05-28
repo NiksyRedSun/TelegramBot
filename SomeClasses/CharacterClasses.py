@@ -22,6 +22,7 @@ class Character(Unit):
         self.quoteIndex = None
         self.in_dead_quote = None
         self.deathCounter = None
+        self.fury = 0
         self.dead_quotes = [f"Вы роняете свое оружие захлебываясь кровью",
                       f"Оружие выпадывает из ваших рук, но вас гораздо больше интересует кровь, которая льется фонтаном из вашей шеи. Вы медленно теряете сознание",
                       f"Ваши внутренности выпадывают наружу, приключение больше не кажется интересным",
@@ -82,7 +83,8 @@ class Character(Unit):
         pres_name = "+" + self.name.center(22, "-") + "+"
         text = [
                 f"<code>{pres_name}</code>",
-                f"Здоровье: {self.hp}/{self.max_hp}".center(40)]
+                f"Здоровье: {self.hp}/{self.max_hp}".center(40),
+                f"Ярость: {self.fury} %".center(43)]
                 # f"Атака: {self.attack}",
                 # f"Защита: {self.defense}",
                 # f"Инициатива: {self.initiative}"]
@@ -100,7 +102,7 @@ class Character(Unit):
             elif self.level < 11:
                 self.next_level_exp = int(100 * (1.85 - (self.level*0.0115)) ** self.level)
             else:
-                self.next_level_exp += 10000 + 2500 * (12 - self.level)
+                self.next_level_exp += 10000 + 750 * (self.level - 12)
             self.level += 1
             if self.level % 2 == 0:
                 self.points += 1
@@ -190,10 +192,10 @@ class Character(Unit):
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
-                hit_damage = int(self.attack * 2.5)
+                hit_damage = int(self.attack * 2.5) + int(self.fury * 0.05*2.5)
                 critical_hit = True
             else:
-                hit_damage = self.attack
+                hit_damage = self.attack + int(self.fury * 0.05)
 
 
             damage = hit_damage + dice() - villian.defense
@@ -232,12 +234,15 @@ class Character(Unit):
                                             ]
 
                 villian.hp -= damage
-
-                if critical_hit:
-                    text.append(critical_hit_quotes[self.quoteIndex])
-                else:
-                    text.append(hit_quotes[self.quoteIndex])
-                players[message.chat.id]["damage"] += damage
+                self.fury_up(int(damage * 0.3))
+                try:
+                    if critical_hit:
+                        text.append(critical_hit_quotes[self.quoteIndex])
+                    else:
+                        text.append(hit_quotes[self.quoteIndex])
+                    players[message.chat.id]["damage"] += damage
+                except:
+                    print("Кто-то отправил сообщение в будущее")
 
                 if critical_hit:
                     text = self.critical_hit_text(text)
@@ -296,10 +301,10 @@ class Character(Unit):
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
-                hit_damage = int(self.attack * 2.5)
+                hit_damage = int(self.attack * 2.5) + int(self.fury * 0.02 * self.attack)
                 critical_hit = True
             else:
-                hit_damage = self.attack
+                hit_damage = self.attack + int(self.fury * 0.02 * self.attack)
 
 
             damage = hit_damage + dice() - mob.defense
@@ -323,6 +328,9 @@ class Character(Unit):
                           f"Ваш удар протыкает нижнюю конечность противника насквозь, при выемке меча противник теряет {damage} hp"]
 
                 mob.hp -= damage
+                self.fury_up(int(damage * 0.3))
+                if self.quoteIndex is None:
+                    return None
 
                 if critical_hit:
                     text.append(critical_hit_quotes[self.quoteIndex])
@@ -353,6 +361,13 @@ class Character(Unit):
         self.deathCounter = None
 
 
+    def check_alive(self):
+        if self.hp <= 0:
+            self.hp = 0
+            self.alive = False
+            self.fury = 0
+
+
     async def fountain_healing(self, heal_hp, message):
         if heal_hp + self.hp < self.max_hp:
             self.hp += heal_hp
@@ -360,6 +375,35 @@ class Character(Unit):
         else:
             self.hp = self.max_hp
             await message.answer(text=f"Фонтан залечил каждую рану на вашем теле")
+
+
+    def five_second_healing(self):
+        if self.hp == self.max_hp:
+            pass
+        else:
+            self.hp += 1
+
+
+    def fury_down(self):
+        if self.fury > 80:
+            self.fury -= 5
+        elif self.fury > 60:
+            self.fury -= 4
+        elif self.fury > 40:
+            self.fury -= 3
+        elif self.fury > 20:
+            self.fury -=2
+        elif self.fury > 0:
+            self.fury -= 1
+        else:
+            pass
+
+
+    def fury_up(self, for_up: int):
+        if self.fury + for_up >= 100:
+            self.fury = 100
+        else:
+            self.fury += for_up
 
 
     async def leave_boss_fight(self, players: dict, villian, bot, message):

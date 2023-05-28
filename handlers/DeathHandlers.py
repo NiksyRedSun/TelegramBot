@@ -41,6 +41,8 @@ async def outrunning_death(message):
                 char.deathCounter = None
         except AttributeError:
             pass
+        except TypeError:
+            print("Если вылетит это сообщение, это будет означать, что задача не перестает выполняться")
 
 
 
@@ -72,6 +74,7 @@ async def try_left_death(message: types.Message, state: FSMContext):
         if char.alive:
             await message.answer(text="Поначалу немного безумно осозновать то, что с вами произошло. Но спустя некоторое "
                                       "время вы успокаиваетесь и решаете продолжить свой путь", reply_markup=menu_keyb)
+            death_tasks_dict[message.chat.id].cancel()
             await GameStates.menuState.set()
         else:
             death_tasks_dict[message.chat.id].cancel()

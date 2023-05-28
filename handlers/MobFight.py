@@ -89,7 +89,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
         if message.text == "Атаковать":
             await char.attack_mob_func(mob, message, mob_fight_dict)
             await mob_fight_presentantion(char, mob, message)
-        elif message.text == "Соскочить":
+        elif message.text == "Сбежать":
             if await char.leave_mob_fight(mob, message):
                 await GameStates.mobChoosing.set()
                 mob_fight_dict[message.chat.id]["mob_task"].cancel()

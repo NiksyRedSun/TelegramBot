@@ -2,7 +2,7 @@ import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
 from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
-from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob
+from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob, ElvenArcherMob, ElvenWizardMob
 from SomeKeyboards import attack_menu_keyb, menu_keyb, end_menu_keyb, mob_next_keyb, next_keyb
 
 
@@ -83,7 +83,7 @@ def give_villian():
 
 
 def give_mobs(mob_link=None):
-    mobs_list = [SceletonMob(), LittleDragonMob(), OrcMob()]
+    mobs_list = [SceletonMob(), LittleDragonMob(), OrcMob(), ElvenWizardMob(), ElvenArcherMob()]
     if mob_link is None:
         text = []
         for mob in mobs_list:
@@ -97,10 +97,14 @@ def give_mobs(mob_link=None):
                 return LittleDragonMob()
             case "/OrcMob":
                 return OrcMob()
+            case "/ElvenWizardMob":
+                return ElvenWizardMob()
+            case "/ElvenArcherMob":
+                return ElvenArcherMob()
 
 
 def give_mobs_links():
-    mobs_list = [SceletonMob(), LittleDragonMob(), OrcMob()]
+    mobs_list = [SceletonMob(), LittleDragonMob(), OrcMob(), ElvenWizardMob(), ElvenArcherMob()]
     result_list = []
     for mob in mobs_list:
         result_list.append(mob.link)

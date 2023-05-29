@@ -19,7 +19,7 @@ import SomeClasses
 from Functions import charChoosing
 from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, temple_keyb, person_keyb
 from SomeAttributes import players_dict, current_boss_fight_team
-from SomeStates import GameStates, PersonStates
+from SomeStates import GameStates, PersonStates, DeathStates
 from EasyGameLoader import dp
 
 
@@ -29,7 +29,7 @@ from EasyGameLoader import dp
 async def villiage(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
     if not char.alive:
-        await GameStates.deadState.set()
+        await DeathStates.deadState.set()
         return None
     if message.text == "Бой с боссом":
         await GameStates.preBossFight.set()
@@ -52,6 +52,14 @@ async def villiage(message: types.Message, state: FSMContext):
         await PersonStates.personMenu.set()
     elif message.text in ["Магазин", "Инвентарь"]:
         await message.answer(text=f"Функционал в разработке")
+    elif message.text == "Осмотреться":
+        looks = ["Вы находитесь на базарной площади небольшого городка",
+                 "Здесь очень шумно, хотя людей, казалось бы, не много",
+                 "Просто стоите посреди базара и тупите",
+                 "Люди на базаре выглядят опасно, но доброжелательно",
+                 "Хотя бы солнышко светит",
+                 "Висит объявление с предложением поработать в огороде"]
+        await message.answer(text=random.choice(looks))
     else:
         await message.answer(text=f"Кто-то называет это место городом, в основном - мэр.\n"
                                   f"Вы и ваши друзья честны друг с другом, поэтому называете это место деревней.\n"

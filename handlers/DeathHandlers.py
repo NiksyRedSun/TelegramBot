@@ -39,10 +39,12 @@ async def outrunning_death(message):
                 await message.answer(text="Вам не удается понять, что произошло. Но, судя по всему, у вас сколько угодно времени. "
                                           "Не похоже, чтобы что-то торопило вас...", reply_markup=next_points_keyb)
                 char.deathCounter = None
+                return None
         except AttributeError:
-            pass
+            return None
         except TypeError:
             print("Если вылетит это сообщение, это будет означать, что задача не перестает выполняться")
+            return None
 
 
 

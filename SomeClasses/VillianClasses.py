@@ -136,7 +136,7 @@ class Villian(Unit):
             char_init = double_dices() + char.initiative
 
             if villian_init > char_init:
-                damage = self.attack + dice() - char.defense - int(char.fury * 0.05)
+                damage = self.attack + dice() - char.defense
 
                 if damage <= 0:
                     text.append(self.give_pos_quotes(char))

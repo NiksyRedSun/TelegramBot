@@ -192,7 +192,7 @@ class Character(Unit):
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
-                hit_damage = int(self.attack * 2.5) + int(self.fury * 0.05*2.5)
+                hit_damage = int(self.attack * 2.5) + int(self.fury*0.05*2.5)
                 critical_hit = True
             else:
                 hit_damage = self.attack + int(self.fury * 0.05)
@@ -234,7 +234,7 @@ class Character(Unit):
                                             ]
 
                 villian.hp -= damage
-                self.fury_up(int(damage * 0.3))
+                self.fury_up(int(damage * 0.5))
                 try:
                     if critical_hit:
                         text.append(critical_hit_quotes[self.quoteIndex])
@@ -242,7 +242,9 @@ class Character(Unit):
                         text.append(hit_quotes[self.quoteIndex])
                     players[message.chat.id]["damage"] += damage
                 except:
-                    print("Кто-то отправил сообщение в будущее")
+                    print(f"{self.name} отправил сообщение в будущее")
+                    await message.answer(text="В противника летит шквал ударов")
+                    return None
 
                 if critical_hit:
                     text = self.critical_hit_text(text)
@@ -301,10 +303,10 @@ class Character(Unit):
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
-                hit_damage = int(self.attack * 2.5) + int(self.fury * 0.02 * self.attack)
+                hit_damage = int(self.attack * 2.5) + int(self.fury*0.05*2.5)
                 critical_hit = True
             else:
-                hit_damage = self.attack + int(self.fury * 0.02 * self.attack)
+                hit_damage = self.attack + int(self.fury * 0.05)
 
 
             damage = hit_damage + dice() - mob.defense
@@ -328,7 +330,7 @@ class Character(Unit):
                           f"Ваш удар протыкает нижнюю конечность противника насквозь, при выемке меча противник теряет {damage} hp"]
 
                 mob.hp -= damage
-                self.fury_up(int(damage * 0.3))
+                self.fury_up(int(damage * 0.5))
                 if self.quoteIndex is None:
                     return None
 

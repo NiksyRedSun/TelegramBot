@@ -28,5 +28,5 @@ async def all_fury_down(players: dict):
                     continue
                 else:
                     players[player].fury_down()
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(1)
 

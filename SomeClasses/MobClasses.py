@@ -82,7 +82,7 @@ class Mob(Unit):
         villian_init = double_dices() + self.initiative
         char_init = double_dices() + char.initiative
         if villian_init > char_init:
-            damage = self.attack + dice() - char.defense - int(char.fury * 0.05)
+            damage = self.attack + dice() - char.defense
 
             if damage <= 0:
                 await message.answer(text=self.pos_quotes[self.quoteIndex])

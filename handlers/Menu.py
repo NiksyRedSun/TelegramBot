@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
-from Functions import charChoosing
+from Functions import charChoosing, show_players
 from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, temple_keyb, person_keyb
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameStates, PersonStates, DeathStates
@@ -44,6 +44,10 @@ async def villiage(message: types.Message, state: FSMContext):
         await message.answer(text=f"Небольшое деревянное строение, внутри алтари местных божеств.\n"
                                   f"В храме можно cохранить текущего персонажа или загрузить предыдущего записанного",
                              parse_mode="HTML", reply_markup=temple_keyb)
+    elif message.text == "Игроки":
+        await message.answer(text=f"Здесь можно увидеть всех игроков в сессии\n",
+                             parse_mode="HTML")
+        await show_players(players_dict, message)
     elif message.text == "Персонаж":
         await message.answer(text=char.presentation(), parse_mode="HTML")
         await message.answer(text="В меню персонажа вы можете поменять имя, описание персонажа,"

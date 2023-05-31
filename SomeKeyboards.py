@@ -11,7 +11,7 @@ next_points_keyb = ReplyKeyboardMarkup(
 menu_keyb = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="Бой с боссом"), KeyboardButton(text="Бой с мобом")],
               [KeyboardButton(text="Магазин"), KeyboardButton(text="Инвентарь")], [KeyboardButton(text="Персонаж")],
-              [KeyboardButton(text="Фонтан"), KeyboardButton(text="Храм")]], resize_keyboard=True)
+              [KeyboardButton(text="Фонтан"), KeyboardButton(text="Игроки"), KeyboardButton(text="Храм")]], resize_keyboard=True)
 
 
 attack_menu_keyb = ReplyKeyboardMarkup(

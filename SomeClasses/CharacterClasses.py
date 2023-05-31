@@ -77,6 +77,30 @@ class Character(Unit):
             text[0] = pres_name
             return '\n'.join(text)
 
+    def in_menu_presentation(self):
+
+        def make_short_string(string: str, long: int):
+            result = ' '
+            word_list = string.split()
+            count = 0
+            for i in word_list:
+                if count + len(i) > long:
+                    result += '\n '
+                    count = 0
+                result += i + " "
+                count += len(i)
+            return result
+
+        pres_name = "<code>" + "+" + self.name.center(28, "-") + "+" + "</code>"
+        pres_level = "<code>" + "+" + ("Уровень: " + str(self.level)).center(28, "-") + "+" + "</code>"
+        text = [
+            f"{pres_name}",
+            make_short_string(self.story, 26),
+            f"",
+            f"{pres_level}"
+        ]
+        return '\n'.join(text)
+
 
 
     def fight_presentation(self):

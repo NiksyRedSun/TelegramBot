@@ -26,7 +26,12 @@ def check_all_team(players: dict):
 
 
 async def show_players(players: dict, message):
-    pass
+    text = []
+    for player in players:
+        text.append(players[player].in_menu_presentation())
+        text.append("")
+    await message.answer(text="\n".join(text), parse_mode="HTML")
+
 
 
 

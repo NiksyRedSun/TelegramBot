@@ -55,12 +55,20 @@ async def death(message: types.Message, state: FSMContext):
     if message.text == "Попытаться вернуться":
         await message.answer(text="Вы переживаете свою смерть еще раз. Последний момент вашей жизни трудноуловимо мелькает где-то рядом "
                                   "Вы пытаетесь проговорить вслух, всё что происходило с вами перед тем как вы провалились в темноту "
-                                  "чтобы понять, что произошло")
+                                  "чтобы понять, что произошло. Отвечайте на текст, всплывающий у вас в голове.")
         char.get_death_counter()
         death_tasks_dict[message.chat.id] = asyncio.create_task(outrunning_death(message))
         await DeathStates.deadLeftState.set()
     elif message.text == "Персонаж":
         await message.answer(text=char.presentation(), parse_mode="HTML")
+    elif message.text == "Осмотреться":
+        looks = ["Вы даже близко не можете представить где находитесь и на что это похоже",
+                 "Пролетая вы видите ВСЕХ людей",
+                 "Ощущается смутное единство всех в смерти",
+                 "Время здесь останавливается, вы просто проживаете все раз за разом",
+                 "Стоило ли оно все того, чтобы в итоге оказаться здесь",
+                 "Ты мог бы стать кем угодно, а теперь мертв"]
+        await message.answer(text=random.choice(looks))
     else:
         await message.answer(text="Смерть - это просто часть пути. К счастью вам повезло, "
                               "и в этом мире смерть не является его концом. Вы застряли между миром живых и миром мертвых, "

@@ -642,3 +642,82 @@ class WyvernVillian(Villian):
             return not_in_attack_quote
 
 
+
+
+class ToadVillian(Villian):
+    def __init__(self):
+        self.name = "Гигантский жаб"
+        self.story = "Тот парень из террариума, но в человеческий рост. Может проглотить за один раз."
+        self.hp = 400
+        self.max_hp = self.hp
+        self.attack = 9
+        self.defense = 4
+        self.initiative = 7
+        self.alive = True
+        self.money = random.randint(1500, 1500)
+        self.exp = random.randint(6000, 6750)
+        self.quoteIndex = 0
+
+        self.quotes = [f"{self.name} выпускает свой язык",
+                  f"{self.name} замахивается лапой",
+                  f"{self.name} делает разрушительный *КВА*"]
+
+        self.dead_quotes = [f"Теряет свой длинный язык",
+                      f"{self.name} опрокидывается в замахе",
+                      f"Теперь {self.name} заканчивает свой *КВА* и жизнь вместе с ним"]
+
+        self.maxQuoteIndex = len(self.quotes) - 1
+
+
+
+    def give_pos_quotes(self, char):
+        pos_quotes = [f"{char.name} успевает уклониться от языка Жабы",
+                      f"{char.name} успевает уклониться от лабы Жабика",
+                      f"{char.name} закрывает уши и не слышит разрушительного *КВА*"]
+        return pos_quotes[self.quoteIndex]
+
+
+    def give_neg_quotes(self, char, damage):
+        neg_quotes = [f"{char.name} получает {damage} урона от удара языком Жабчика в лицо",
+                      f"{char.name} получает {damage}  урона от удара лапы Жабчика по лицу",
+                      f"{char.name} ловит звон в ушах и головную боль, теряя {damage} hp"]
+        return neg_quotes[self.quoteIndex]
+
+
+
+    def give_really_neg_quotes(self, char, damage):
+        really_neg_quotes = [f"{char.name} втянут в живот Жабчика и задерживается там на {damage} урона",
+                             f"{char.name} откинут лапой Жабчика в близлежащее дерево",
+                             f"{char.name} теряет кровь из ушей и {damage} hp"]
+        return really_neg_quotes[self.quoteIndex]
+
+
+    def give_player_dead_quotes(self):
+        player_dead_quotes = [f"Попадание в живот Жабеса сулит вам скорую смерть. Содержимое желудка уже занимается вашим перевариванием. Снизу вверх, вы прожигаетесь кислотой и испускаете дух",
+                             f"Удар Жабеса настолько сильный, что пробивает вашу голову, отправляя вас к праотцам",
+                             f"Будучи оглушенным, вы падаете на землю. Последующий наскок Жабы, придавливает вас. Думали ли вы когда-нибудь, что увидите свои внутренности, выходящие изо рта"]
+        return player_dead_quotes[self.quoteIndex]
+
+
+    def give_in_dead_quotes_for_player(self):
+        in_attack_quotes = [f"Вы пытаетесь бежать, но вас сносит ударом языка в спину, при падении вы разбиваете голову. Пытаясь ползти, вы начинаете медленно терять сознание",
+                  f"Вы пытаетесь бежать, но не успеваете сделать и шагу, как оказываетесь придавлены Жабесом. Думали ли вы когда-нибудь, что увидите свои внутренности, выходящие изо рта",
+                  f"Сделав несколько шагов назад, вы глохнете от Кваканья Жабчика и падаете на землю. Пытаясь ползти, вы медленно теряете сознание"]
+
+        not_in_attack_quote = 'Жабчик прочитал ваши мысли быстрее, чем вы успели сдвинуться с места. Своим языком, он пригвоздил вас к дереву и проглотил целиком.'
+        if self.quoteIndex is not None:
+            return in_attack_quotes[self.quoteIndex]
+        else:
+            return not_in_attack_quote
+
+
+    def give_in_dead_quotes_for_team(self, char):
+        in_attack_quotes = [f"{char.name} попытался бежать, но отлетел от удара языка Жабчика в спину, разбив голову при падении",
+                  f"{char.name} попытался бежать, но был придавлен Жабчиком, оставив внутренности на земле",
+                  f"{char.name} попытался бежать, но упал после оглушения Кваком"]
+
+        not_in_attack_quote = f'{char.name} пытался сбежать, но Жабес пригвоздил к дереву с последующим проглатыванием'
+        if self.quoteIndex is not None:
+            return in_attack_quotes[self.quoteIndex]
+        else:
+            return not_in_attack_quote

@@ -1,7 +1,7 @@
 import random
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.CharacterClasses import Character
-from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian
+from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian, ToadVillian
 from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob, ElvenArcherMob, ElvenWizardMob
 from SomeKeyboards import attack_menu_keyb, menu_keyb, end_menu_keyb, mob_next_keyb, next_keyb
 
@@ -79,7 +79,7 @@ async def mob_fight_presentantion(char, mob, message):
 
 
 def give_villian():
-    return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian()])
+    return random.choice([DragonVillian(), SpiderVillian(), GolemVillian(), TreeVillian(), WyvernVillian(), ToadVillian()])
 
 
 def give_mobs(mob_link=None):

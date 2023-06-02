@@ -25,6 +25,15 @@ from SomeRepos.CharsRepo import get_char
 from SomeClasses.CharacterClasses import Character
 
 
+@dp.message_handler(Command("start"))
+async def bot_start_with_command(message: types.Message):
+    await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"
+                              f"Нажмите 'Начать', чтобы начать\n"
+                              f"Если у вас уже есть персонаж выберете соответствующий пункт меню", reply_markup=start_keyb)
+    players_dict[message.chat.id] = None
+
+
+
 @dp.message_handler(Text("Старт"))
 async def bot_start(message: types.Message):
     await message.answer(text=f"Вашему вниманию - мини игра для отдыхающих \n"
@@ -34,7 +43,7 @@ async def bot_start(message: types.Message):
 
 
 
-@dp.message_handler(Text("Начать"), state=None)
+@dp.message_handler(Text("Начать"))
 async def name_choice(message: types.Message):
     await message.answer(text="Придумайте имя своему персонажу и отправьте его сообщением")
     players_dict[message.chat.id] = Character("Имя", "Описание")

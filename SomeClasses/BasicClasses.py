@@ -78,30 +78,3 @@ class DeathCounter:
             return False
 
 
-
-
-class Item:
-    def __init__(self):
-        self.name = None
-
-
-
-
-class HealItem(Item):
-    def __init__(self):
-        self.name = "Зелье восстановления здоровья"
-        self.tname = "/healingPotion"
-        self.time = 5
-
-    async def healing(self, char):
-        while self.time > 0:
-            if char.alive:
-                if char.hp + 3 >= char.max_hp:
-                    char.hp = char.max_hp
-                else:
-                    char.hp += 3
-            else:
-                break
-            self.time -= 1
-            await asyncio.sleep(1)
-

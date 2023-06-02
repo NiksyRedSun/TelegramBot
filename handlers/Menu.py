@@ -17,9 +17,9 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
 from Functions import charChoosing, show_players
-from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, temple_keyb, person_keyb
+from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, temple_keyb, person_keyb, shop_keyb
 from SomeAttributes import players_dict, current_boss_fight_team
-from SomeStates import GameStates, PersonStates, DeathStates
+from SomeStates import GameStates, PersonStates, DeathStates, ShopStates
 from EasyGameLoader import dp
 
 
@@ -54,8 +54,11 @@ async def villiage(message: types.Message, state: FSMContext):
                                   " распределить или перераспределить очки умений", parse_mode="HTML",
                              reply_markup=person_keyb)
         await PersonStates.personMenu.set()
-    elif message.text in ["Магазин", "Инвентарь"]:
-        await message.answer(text=f"Функционал в разработке")
+    elif message.text == "Магазин":
+        await ShopStates.inShopState.set()
+        await message.answer(text="Добро пожаловать в лавку братьев Каровановых, что вас интересует?", reply_markup=shop_keyb)
+    elif message.text == "Инвентарь":
+        await char.show_inv(message)
     elif message.text == "Осмотреться":
         looks = ["Вы находитесь на базарной площади небольшого городка",
                  "Здесь очень шумно, хотя людей, казалось бы, не много",

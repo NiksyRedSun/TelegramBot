@@ -30,3 +30,9 @@ class PersonStates(StatesGroup):
 class DeathStates(StatesGroup):
     deadState = State()
     deadLeftState = State()
+
+
+class ShopStates(StatesGroup):
+    inShopState = State()
+    buyState = State()
+

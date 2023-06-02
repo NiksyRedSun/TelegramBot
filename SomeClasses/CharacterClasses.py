@@ -1,6 +1,7 @@
 from SomeClasses.BasicClasses import Unit, dice, double_dices, DeathCounter
 from SomeClasses.VillianClasses import Villian
 from SomeClasses.MobClasses import Mob
+from SomeClasses.ItemsClasses import HealingPotion
 import random
 import asyncio
 from EasyGameLoader import bot
@@ -30,9 +31,31 @@ class Character(Unit):
                       f"Стоя на коленях и готовясь уйти лбом в землю, вы начинаете забывать о том как оказались здесь и медленно теряете сознание",
                       f"В последний раз взглянув на свои окровавленные руки, вы начинаете думать о том, была ли эта смерть славной. Вас погружает в вечный сон"]
 
-        # self.sudden_death_quotes = ["Отсутствие сосредоточенности в момент битвы привело к тому, что вы даже близко не можете вспомнить, как образовалась глубокая кровоточащая дыра на передней поверхности грудной клетки",
-        #                             "Совершненно очевидно, что во время боя не стоит считать ворон. То что вы оказались в канаве со сломанными ногами - закономерный процесс вашего отвлечения",
-        #                             "Сосредоточение ключ к жизни. Жаль, что вы пришли к этому только сейчас, когда отвлечение привело вас к множественным переломам позвоночника и неспособностью пошевалить какой-угодно частью тела"]
+        self.effects = {"healing": None}
+        self.inventory = []
+
+
+    async def show_inv(self, message):
+
+        def count_objects(lst, obj_type):
+            count = 0
+            for obj in lst:
+                if isinstance(obj, obj_type):
+                    count += 1
+            return count
+
+        items = [HealingPotion]
+        items.sort(key=lambda item: item().name)
+        message_text = []
+        for item in items:
+            count = count_objects(self.inventory, item)
+            if count > 0:
+                message_text.append(item().show_in_inv(count))
+
+        if message_text:
+            await message.answer(text='\n'.join(message_text))
+        else:
+            await message.answer(text="Ваш инвентарь пуст")
 
 
     def presentation(self):

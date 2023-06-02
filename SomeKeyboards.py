@@ -40,6 +40,9 @@ start_keyb = ReplyKeyboardMarkup(
 to_vil_keyb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="В деревню")]], resize_keyboard=True)
 
+shop_keyb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Асортимент")], [KeyboardButton(text="В деревню")]], resize_keyboard=True)
+
 
 temple_keyb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Сохранить")], [KeyboardButton(text="Загрузить")], [KeyboardButton(text="В деревню")]], resize_keyboard=True)

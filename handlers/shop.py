@@ -4,18 +4,12 @@ from aiogram.dispatcher.filters.builtin import CommandStart, CommandHelp, Text, 
 from aiogram.dispatcher.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from EasyGameLoader import dp
-from SomeAttributes import players_dict
+from SomeAttributes import players_dict, all_items, all_items_dict, all_items_tnames
 from SomeStates import GameStates, ShopStates
 from SomeClasses.ItemsClasses import HealingPotion
 from SomeKeyboards import menu_keyb
 from aiogram.dispatcher.storage import FSMContext
 
-
-
-all_items = [HealingPotion]
-all_items_tnames = list(map(lambda item: item().tname, all_items))
-all_items_dict = {item().tname: item for item in all_items}
-all_items.sort(key=lambda item: item().name)
 
 
 async def assortment(message):

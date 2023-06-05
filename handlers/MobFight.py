@@ -8,7 +8,7 @@ from SomeStates import GameStates, DeathStates
 from EasyGameLoader import dp
 from Functions import give_mobs, give_mobs_links, mob_fight_presentantion
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb, mob_fight_menu_keyb
-from SomeAttributes import players_dict, mob_fight_dict
+from SomeAttributes import players_dict, mob_fight_dict, all_items_dict, all_items_tnames
 from RateLimit import rate_limit, ThrottlingMiddleware
 import asyncio
 
@@ -106,6 +106,13 @@ async def boss_fight(message: types.Message, state: FSMContext):
             await GameStates.mobChoosing.set()
             await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
             await message.answer(text='\n'.join(give_mobs()))
+
+        elif message.text == "Инвентарь":
+            await char.show_inv_in_fight(message)
+
+
+        elif message.text in all_items_tnames:
+            await all_items_dict[message.text]().item_task(message, char)
 
 
         else:

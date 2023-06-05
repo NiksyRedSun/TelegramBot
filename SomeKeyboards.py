@@ -15,7 +15,7 @@ menu_keyb = ReplyKeyboardMarkup(
 
 
 attack_menu_keyb = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Сбежать")]], resize_keyboard=True)
+    keyboard=[[KeyboardButton(text="Атаковать")], [KeyboardButton(text="Сбежать"), KeyboardButton(text="Инвентарь")]], resize_keyboard=True)
 
 end_menu_keyb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Закончить")]], resize_keyboard=True)

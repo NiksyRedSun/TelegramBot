@@ -16,7 +16,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 import SomeClasses
-from Functions import charChoosing, show_players
+from Functions import show_players
 from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, temple_keyb, person_keyb, shop_keyb
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameStates, PersonStates, DeathStates, ShopStates

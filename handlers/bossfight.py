@@ -19,7 +19,7 @@ import asyncio
 from RateLimit import rate_limit, ThrottlingMiddleware
 from Functions import check_all_team, fight_presentantion, give_villian
 from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb
-from SomeAttributes import current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over
+from SomeAttributes import current_boss_fight_team, boss_fight_team, players_dict, boss_fight_is_on, boss_fight_is_over, all_items_tnames, all_items_dict
 from SomeStates import GameStates, DeathStates
 from EasyGameLoader import dp, bot
 from threading import Thread
@@ -138,6 +138,12 @@ async def boss_fight(message: types.Message, state: FSMContext):
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameStates.menuState.set()
                 await message.answer(text="Вы удачно соскакиваете с битвы", reply_markup=menu_keyb)
+
+        elif message.text == "Инвентарь":
+            await char.show_inv_in_fight(message)
+
+        elif message.text in all_items_tnames:
+            await all_items_dict[message.text]().item_task(message, char)
 
         elif message.text == "Закончить":
             if boss_fight_is_over:

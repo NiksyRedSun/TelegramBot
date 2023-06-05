@@ -1,13 +1,13 @@
 from SomeClasses.BasicClasses import Unit, dice, double_dices, DeathCounter
 from SomeClasses.VillianClasses import Villian
 from SomeClasses.MobClasses import Mob
-from SomeClasses.ItemsClasses import HealingPotion
+from SomeClasses.ItemsClasses import HealingPotion, LiqPotion
 import random
 import asyncio
 from EasyGameLoader import bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb
-
+from SomeAttributes import all_items
 
 
 
@@ -31,26 +31,41 @@ class Character(Unit):
                       f"Стоя на коленях и готовясь уйти лбом в землю, вы начинаете забывать о том как оказались здесь и медленно теряете сознание",
                       f"В последний раз взглянув на свои окровавленные руки, вы начинаете думать о том, была ли эта смерть славной. Вас погружает в вечный сон"]
 
-        self.effects = {"healing": None}
+        self.effects = {item().name: None for item in all_items}
         self.inventory = []
 
 
+    def count_objects(self, lst, obj_type):
+        count = 0
+        for obj in lst:
+            if isinstance(obj, obj_type):
+                count += 1
+        return count
+
+
+
     async def show_inv(self, message):
-
-        def count_objects(lst, obj_type):
-            count = 0
-            for obj in lst:
-                if isinstance(obj, obj_type):
-                    count += 1
-            return count
-
         items = [HealingPotion]
         items.sort(key=lambda item: item().name)
         message_text = []
         for item in items:
-            count = count_objects(self.inventory, item)
+            count = self.count_objects(self.inventory, item)
             if count > 0:
                 message_text.append(item().show_in_inv(count))
+
+        if message_text:
+            await message.answer(text='\n'.join(message_text))
+        else:
+            await message.answer(text="Ваш инвентарь пуст")
+
+
+    async def show_inv_in_fight(self, message):
+        items = all_items
+        message_text = []
+        for item in items:
+            count = self.count_objects(self.inventory, item)
+            if count > 0:
+                message_text.append(item().show_in_fight())
 
         if message_text:
             await message.answer(text='\n'.join(message_text))
@@ -415,6 +430,10 @@ class Character(Unit):
             self.hp = 0
             self.alive = False
             self.fury = 0
+            for effect in self.effects:
+                if self.effects[effect] is not None:
+                    self.effects[effect].cancel()
+                    self.effects[effect] = None
 
 
     async def fountain_healing(self, heal_hp, message):

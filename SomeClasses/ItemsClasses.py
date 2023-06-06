@@ -30,6 +30,7 @@ class HealingPotion(Item):
         self.info = "Восстанавливает два hp раз в две секунды, в течение 10и секунду "
         self.time = 5
         self.cost = 500
+        self.quote = "Вас поправляет..."
 
 
     def remove_object(self, lst, obj_type):
@@ -54,6 +55,9 @@ class HealingPotion(Item):
             await asyncio.sleep(2)
         char.effects[self.name] = None
 
+    def char_ret_stat(self, char):
+        pass
+
 
     async def item_task(self, message, char):
         if char.effects[self.name] is not None:
@@ -64,6 +68,9 @@ class HealingPotion(Item):
             await message.answer(text="Зелье лечения использовано")
         else:
             await message.answer(text="У вас нет зелья лечения в инвентаре")
+
+    def status(self):
+        return self.quote
 
 
 
@@ -76,6 +83,7 @@ class LiqPotion(Item):
         self.info = "Поднимает ваш уровень агрессии до заоблачных высот"
         self.time = 5
         self.cost = 1000
+        self.quote = "Эх, наливочка..."
 
 
     def remove_object(self, lst, obj_type):
@@ -112,5 +120,100 @@ class LiqPotion(Item):
         else:
             await message.answer(text="У вас нет наливочки")
 
+    def char_ret_stat(self, char):
+        pass
 
 
+    def status(self):
+        return self.quote
+
+
+
+
+
+
+class ConcentreationScroll(Item):
+    def __init__(self):
+        self.name = "Свиток концентрации"
+        self.tname = '/conScroll'
+        self.info = "Всем уже давно пора приобрести такие"
+        self.cost = 1000
+        self.quote = "Концентрация!"
+
+
+    def remove_object(self, lst, obj_type):
+        for obj in lst:
+            if isinstance(obj, obj_type):
+                lst.remove(obj)
+                return True
+        return False
+
+
+    async def concentrating(self, char):
+        char.initiative += 1
+        await asyncio.sleep(10)
+        char.initiative -= 1
+        char.effects[self.name] = None
+
+
+    async def item_task(self, message, char):
+        if char.effects[self.name] is not None:
+            if not char.effects[self.name].done():
+                await message.answer(text="Предыдущий свиток концентрации еще действует")
+                return None
+        if self.remove_object(char.inventory, LiqPotion):
+            char.effects[self.name] = asyncio.create_task(self.concentrating(char))
+            await message.answer(text="Вы прочитывайте свиток концентрации")
+        else:
+            await message.answer(text="У вас нет свитка концентрации")
+
+    def char_ret_stat(self, char):
+        char.initiative -= 1
+
+
+    def status(self):
+        return self.quote
+
+
+
+class Poison(Item):
+    def __init__(self):
+        self.name = "Яд на оружие"
+        self.tname = '/poison'
+        self.info = "Свежее поступление. Наносить на начищенный до блеска меч, до 3х раз в день"
+        self.cost = 1500
+        self.quote = "Оружие отравлено"
+
+
+    def remove_object(self, lst, obj_type):
+        for obj in lst:
+            if isinstance(obj, obj_type):
+                lst.remove(obj)
+                return True
+        return False
+
+
+    async def concentrating(self, char):
+        char.attack += 3
+        await asyncio.sleep(15)
+        char.attack -= 3
+        char.effects[self.name] = None
+
+
+    async def item_task(self, message, char):
+        if char.effects[self.name] is not None:
+            if not char.effects[self.name].done():
+                await message.answer(text="Предыдущая порция яда еще не смылась")
+                return None
+        if self.remove_object(char.inventory, LiqPotion):
+            char.effects[self.name] = asyncio.create_task(self.concentrating(char))
+            await message.answer(text="Вы смазываете свое оружие ядом")
+        else:
+            await message.answer(text="У вас нет яда")
+
+    def char_ret_stat(self, char):
+        char.attack -= 3
+
+
+    def status(self):
+        return self.quote

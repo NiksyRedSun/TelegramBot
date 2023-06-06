@@ -7,7 +7,7 @@ import asyncio
 from EasyGameLoader import bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb
-from SomeAttributes import all_items
+from SomeAttributes import all_items, all_items_dict_cost
 
 
 
@@ -45,10 +45,8 @@ class Character(Unit):
 
 
     async def show_inv(self, message):
-        items = [HealingPotion]
-        items.sort(key=lambda item: item().name)
         message_text = []
-        for item in items:
+        for item in all_items:
             count = self.count_objects(self.inventory, item)
             if count > 0:
                 message_text.append(item().show_in_inv(count))
@@ -140,16 +138,30 @@ class Character(Unit):
         return '\n'.join(text)
 
 
+    def give_effects_info(self):
+        effects_text = []
+        for effect in self.effects:
+            if self.effects[effect] is not None:
+                if not self.effects[effect].done():
+                    effects_text.append(all_items_dict_cost[effect]().status)
+        if effects_text:
+            return effects_text
+        else:
+            return None
+
+
+
+
 
     def fight_presentation(self):
         pres_name = "+" + self.name.center(22, "-") + "+"
-        text = [
-                f"<code>{pres_name}</code>",
+        text = [f"<code>{pres_name}</code>",
                 f"Здоровье: {self.hp}/{self.max_hp}".center(40),
                 f"Ярость: {self.fury} %".center(43)]
-                # f"Атака: {self.attack}",
-                # f"Защита: {self.defense}",
-                # f"Инициатива: {self.initiative}"]
+        for effect in self.effects:
+            if self.effects[effect] is not None:
+                if not self.effects[effect].done():
+                    text.append(all_items_dict_cost[effect]().status().center(43))
         return '\n'.join(text)
 
 
@@ -432,7 +444,23 @@ class Character(Unit):
             self.fury = 0
             for effect in self.effects:
                 if self.effects[effect] is not None:
-                    self.effects[effect].cancel()
+                    if not self.effects[self.name].done():
+                        all_items_dict_cost[effect]().char_ret_stat(self)
+                        self.effects[self.name].cancel()
+                        self.effects[effect] = None
+                    else:
+                        self.effects[effect] = None
+
+
+    def remove_effects(self):
+        for effect in self.effects:
+            if self.effects[effect] is not None:
+                if not self.effects[self.name].done():
+                    all_items_dict_cost[effect]().char_ret_stat(self)
+                    self.effects[self.name].cancel()
+                    self.effects[effect] = None
+                else:
+                    all_items_dict_cost[effect]().char_ret_stat(self)
                     self.effects[effect] = None
 
 

@@ -28,6 +28,7 @@ from SomeRepos.CharsRepo import get_char, delete_char, post_char
 async def temple(message: types.Message, state: FSMContext):
     if message.text == "Сохранить":
         char = players_dict[message.chat.id]
+        char.remove_effects()
         delete_char(message.chat.id)
         await message.answer(text=post_char(message.chat.id, char))
     elif message.text == "Загрузить":

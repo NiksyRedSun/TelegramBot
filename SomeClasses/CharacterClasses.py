@@ -151,8 +151,6 @@ class Character(Unit):
 
 
 
-
-
     def fight_presentation(self):
         pres_name = "+" + self.name.center(22, "-") + "+"
         text = [f"<code>{pres_name}</code>",
@@ -161,7 +159,7 @@ class Character(Unit):
         for effect in self.effects:
             if self.effects[effect] is not None:
                 if not self.effects[effect].done():
-                    text.append(all_items_dict_cost[effect]().status().center(43))
+                    text.append(" "*12 + all_items_dict_cost[effect]().status())
         return '\n'.join(text)
 
 

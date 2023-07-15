@@ -15,7 +15,7 @@ class Item:
 
 
     def show_in_inv(self, count):
-        return f"{self.name} - {count} штук"
+        return f"{self.name} - {count} шт"
 
 
     def show_in_fight(self):
@@ -161,7 +161,7 @@ class ConcentreationScroll(Item):
             if not char.effects[self.name].done():
                 await message.answer(text="Предыдущий свиток концентрации еще действует")
                 return None
-        if self.remove_object(char.inventory, LiqPotion):
+        if self.remove_object(char.inventory, ConcentreationScroll):
             char.effects[self.name] = asyncio.create_task(self.concentrating(char))
             await message.answer(text="Вы прочитывайте свиток концентрации")
         else:
@@ -205,7 +205,7 @@ class Poison(Item):
             if not char.effects[self.name].done():
                 await message.answer(text="Предыдущая порция яда еще не смылась")
                 return None
-        if self.remove_object(char.inventory, LiqPotion):
+        if self.remove_object(char.inventory, Poison):
             char.effects[self.name] = asyncio.create_task(self.concentrating(char))
             await message.answer(text="Вы смазываете свое оружие ядом")
         else:

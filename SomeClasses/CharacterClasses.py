@@ -164,7 +164,10 @@ class Character(Unit):
 
 
     def get_death_counter(self):
-        self.deathCounter = DeathCounter(self.in_dead_quote)
+        if self.in_dead_quote is not None:
+            self.deathCounter = DeathCounter(self.in_dead_quote)
+        else:
+            self.deathCounter = DeathCounter(random.choice(self.dead_quotes))
 
 
     def next_level(self):

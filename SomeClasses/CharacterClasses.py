@@ -149,8 +149,6 @@ class Character(Unit):
         else:
             return None
 
-
-
     def fight_presentation(self):
         pres_name = "+" + self.name.center(22, "-") + "+"
         text = [f"<code>{pres_name}</code>",
@@ -162,13 +160,11 @@ class Character(Unit):
                     text.append(" "*12 + all_items_dict_cost[effect]().status())
         return '\n'.join(text)
 
-
     def get_death_counter(self):
         if self.in_dead_quote is not None:
             self.deathCounter = DeathCounter(self.in_dead_quote)
         else:
             self.deathCounter = DeathCounter(random.choice(self.dead_quotes))
-
 
     def next_level(self):
         while self.exp > self.next_level_exp:
@@ -182,7 +178,6 @@ class Character(Unit):
             if self.level % 2 == 0:
                 self.points += 1
             self.hp = self.max_hp
-
 
     def points_distr(self, skill: str):
         match skill:
@@ -222,8 +217,6 @@ class Character(Unit):
                     self.defense = 0
                     self.initiative = 0
                     return f"Вы обнулили очки умений\nКоличество очков умений теперь: {self.points} "
-
-
 
 
     def critical_hit_text(self, text: list):

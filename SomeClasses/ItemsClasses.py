@@ -8,19 +8,21 @@ class Item:
         self.cost = None
         self.info = None
 
-
-
     def shop_info(self):
         return f"{self.tname} - {self.name}. Стоимость: {self.cost} монет\n{self.info}"
-
 
     def show_in_inv(self, count):
         return f"{self.name} - {count} шт"
 
-
     def show_in_fight(self):
         return f"{self.tname} - {self.name}"
 
+    def remove_object(self, lst, obj_type):
+        for obj in lst:
+            if isinstance(obj, obj_type):
+                lst.remove(obj)
+                return True
+        return False
 
 
 class HealingPotion(Item):
@@ -31,16 +33,6 @@ class HealingPotion(Item):
         self.time = 5
         self.cost = 500
         self.quote = "Вас поправляет..."
-
-
-    def remove_object(self, lst, obj_type):
-        for obj in lst:
-            if isinstance(obj, obj_type):
-                lst.remove(obj)
-                return True
-        return False
-
-
 
     async def healing(self, char):
         while self.time > 0:
@@ -58,7 +50,6 @@ class HealingPotion(Item):
     def char_ret_stat(self, char):
         pass
 
-
     async def item_task(self, message, char):
         if char.effects[self.name] is not None:
             char.effects[self.name].cancel()
@@ -73,9 +64,6 @@ class HealingPotion(Item):
         return self.quote
 
 
-
-
-
 class LiqPotion(Item):
     def __init__(self):
         self.name = "Наливка из местного *РОСКОМНАДЗОР* ресторана"
@@ -84,15 +72,6 @@ class LiqPotion(Item):
         self.time = 5
         self.cost = 1000
         self.quote = "Эх, наливочка..."
-
-
-    def remove_object(self, lst, obj_type):
-        for obj in lst:
-            if isinstance(obj, obj_type):
-                lst.remove(obj)
-                return True
-        return False
-
 
     async def inqreasing(self, char):
         while self.time > 0:
@@ -107,7 +86,6 @@ class LiqPotion(Item):
             await asyncio.sleep(2)
         await asyncio.sleep(20)
         char.effects[self.name] = None
-
 
     async def item_task(self, message, char):
         if char.effects[self.name] is not None:
@@ -128,10 +106,6 @@ class LiqPotion(Item):
         return self.quote
 
 
-
-
-
-
 class ConcentreationScroll(Item):
     def __init__(self):
         self.name = "Свиток концентрации"
@@ -140,21 +114,11 @@ class ConcentreationScroll(Item):
         self.cost = 1000
         self.quote = "Концентрация!"
 
-
-    def remove_object(self, lst, obj_type):
-        for obj in lst:
-            if isinstance(obj, obj_type):
-                lst.remove(obj)
-                return True
-        return False
-
-
     async def concentrating(self, char):
         char.initiative += 1
         await asyncio.sleep(10)
         char.initiative -= 1
         char.effects[self.name] = None
-
 
     async def item_task(self, message, char):
         if char.effects[self.name] is not None:
@@ -170,7 +134,6 @@ class ConcentreationScroll(Item):
     def char_ret_stat(self, char):
         char.initiative -= 1
 
-
     def status(self):
         return self.quote
 
@@ -184,21 +147,11 @@ class Poison(Item):
         self.cost = 1500
         self.quote = "Оружие отравлено"
 
-
-    def remove_object(self, lst, obj_type):
-        for obj in lst:
-            if isinstance(obj, obj_type):
-                lst.remove(obj)
-                return True
-        return False
-
-
-    async def concentrating(self, char):
+    async def poisoning(self, char):
         char.attack += 3
         await asyncio.sleep(15)
         char.attack -= 3
         char.effects[self.name] = None
-
 
     async def item_task(self, message, char):
         if char.effects[self.name] is not None:
@@ -206,14 +159,13 @@ class Poison(Item):
                 await message.answer(text="Предыдущая порция яда еще не смылась")
                 return None
         if self.remove_object(char.inventory, Poison):
-            char.effects[self.name] = asyncio.create_task(self.concentrating(char))
+            char.effects[self.name] = asyncio.create_task(self.poisoning(char))
             await message.answer(text="Вы смазываете свое оружие ядом")
         else:
             await message.answer(text="У вас нет яда")
 
     def char_ret_stat(self, char):
         char.attack -= 3
-
 
     def status(self):
         return self.quote

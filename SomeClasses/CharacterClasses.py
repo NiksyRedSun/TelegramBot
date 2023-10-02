@@ -33,6 +33,7 @@ class Character(Unit):
 
         self.effects = {item().name: None for item in all_items}
         self.inventory = []
+        self.in_avoid = False
 
 
     def count_objects(self, lst, obj_type):
@@ -330,6 +331,7 @@ class Character(Unit):
                     if villian.quoteIndex is not None:
                         await bot.send_message(chat_id=player, text=villian.dead_quotes[villian.quoteIndex])
                     await bot.send_message(chat_id=player, text=f"<b>Рейд-босс мертв</b>", parse_mode="HTML", reply_markup=end_menu_keyb)
+                self.in_avoid = False
 
         else:
             text.append(f"Вы промахиваетесь")
@@ -418,6 +420,7 @@ class Character(Unit):
                 else:
                     await message.answer(text=random.choice(mob.dead_quotes), reply_markup=mob_next_keyb)
                 mob_fighters[message.chat.id]['death_mobs'] += 1
+                self.in_avoid = False
         else:
             text.append(f"Вы промахиваетесь")
             await message.answer(text="\n".join(text), parse_mode="HTML")
@@ -435,6 +438,7 @@ class Character(Unit):
         if self.hp <= 0:
             self.hp = 0
             self.alive = False
+            self.in_avoid = False
             self.fury = 0
             for effect in self.effects:
                 if self.effects[effect] is not None:
@@ -497,6 +501,7 @@ class Character(Unit):
 
 
     async def leave_boss_fight(self, players: dict, villian, bot, message):
+        self.in_avoid = False
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init - villian_init > 2:
@@ -536,6 +541,7 @@ class Character(Unit):
 
 
     async def leave_mob_fight(self, mob, message):
+        self.in_avoid = False
         hero_init = double_dices() + self.initiative
         mob_init = double_dices() + mob.initiative
         if hero_init - mob_init > 2:
@@ -555,6 +561,15 @@ class Character(Unit):
                 else:
                     await message.answer(text=f"У вас не получилось соскочить с битвы, {mob.name} ударил вас в спину при попытке к бегству, вы потеряли {damage} hp")
                 return False
+
+
+    async def avoid_enemy(self, message, enemy):
+        if enemy.quoteIndex is not None:
+            await message.answer(text=f"Вы пытаетесь совершить уклонение")
+        else:
+            await message.answer(text=f"Враг не атакует")
+        self.in_avoid = True
+
 
 
 

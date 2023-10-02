@@ -142,6 +142,9 @@ async def boss_fight(message: types.Message, state: FSMContext):
         elif message.text == "Инвентарь":
             await char.show_inv_in_fight(message)
 
+        elif message.text == "Уклониться":
+            await char.avoid_enemy(message, villian)
+
         elif message.text in all_items_tnames:
             await all_items_dict[message.text]().item_task(message, char)
 

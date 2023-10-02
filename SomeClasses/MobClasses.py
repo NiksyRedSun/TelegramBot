@@ -80,13 +80,19 @@ class Mob(Unit):
             return None
 
         villian_init = double_dices() + self.initiative
-        char_init = double_dices() + char.initiative
+        if char.in_avoid:
+            char_init = double_dices() + char.initiative
+        else:
+            char_init = double_dices()
+
         if villian_init > char_init:
             damage = self.attack + dice() - char.defense
 
             if damage <= 0:
-                await message.answer(text=self.pos_quotes[self.quoteIndex])
+                await message.answer(text="Противник попадает по вам, но не наносит урона")
             else:
+                if char.in_avoid:
+                    await message.answer(text="Уклонение безуспешно")
                 char.hp -= damage
                 await message.answer(text=self.give_neg_quotes(damage))
                 char.check_alive()
@@ -98,8 +104,11 @@ class Mob(Unit):
                         char.in_dead_quote = random.choice(self.char_killed_quotes)
                         await message.answer(text=char.in_dead_quote, reply_markup=next_keyb)
         else:
+            if char.in_avoid:
+                await message.answer(text="Уклонение успешно")
             await message.answer(text=self.pos_quotes[self.quoteIndex])
         self.quoteIndex = None
+        char.in_avoid = False
 
 
 

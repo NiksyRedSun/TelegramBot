@@ -1,5 +1,4 @@
 import SomeClasses
-from Functions import give_villian
 from SomeClasses.ItemsClasses import HealingPotion, LiqPotion, ConcentreationScroll, Poison
 
 

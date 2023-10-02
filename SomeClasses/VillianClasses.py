@@ -94,6 +94,9 @@ class Villian(Unit):
         pos_quotes = []
         return pos_quotes[self.quoteIndex]
 
+    def give_immortal_quote(self, char):
+        return f"{char.name} не успевает уклониться от удара, но и не получает урона"
+
 
     def give_neg_quotes(self, char, damage):
         neg_quotes = []
@@ -133,14 +136,19 @@ class Villian(Unit):
         if char.alive:
 
             villian_init = double_dices() + self.initiative
-            char_init = double_dices() + char.initiative
+            if char.in_avoid:
+                char_init = double_dices() + char.initiative
+            else:
+                char_init = double_dices()
 
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense
 
                 if damage <= 0:
-                    text.append(self.give_pos_quotes(char))
+                    text.append(self.give_immortal_quote(char))
                 else:
+                    if char.in_avoid:
+                        text.append(f"{char.name} пытается совершить уклонение, но безуспешно")
                     char.hp -= damage
                     if damage > 10:
                         text.append(self.give_really_neg_quotes(char, damage))
@@ -158,8 +166,11 @@ class Villian(Unit):
                             await bot.send_message(chat_id=id, text=char.in_dead_quote)
 
             else:
+                if char.in_avoid:
+                    text.append(f"{char.name} успешно совершает уклонение")
                 text.append(self.give_pos_quotes(char))
             text.append("")
+        char.in_avoid = False
 
 
 

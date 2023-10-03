@@ -8,3 +8,4 @@
 /venv
 tests.py
 SomeRepos/Chars.db
+SomeRepos/TgBotdb.db

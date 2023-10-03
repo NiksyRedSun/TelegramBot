@@ -20,7 +20,7 @@ from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, start_keyb, to
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameStates
 from EasyGameLoader import dp
-from SomeRepos.CharsRepo import get_char, delete_char, post_char
+from SomeRepos.sqlaORM import get_char, delete_char, post_char
 
 
 

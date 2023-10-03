@@ -1,24 +1,5 @@
-import random
-import time
 import sqlite3
-import dotenv
-import os
-from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
-from aiogram.dispatcher.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.dispatcher.storage import FSMContext
-from aiogram.utils.exceptions import Throttled
-from aiogram.dispatcher.middlewares import BaseMiddleware
-from aiogram.dispatcher import DEFAULT_RATE_LIMIT
-import asyncio
-from RateLimit import rate_limit, ThrottlingMiddleware
-import SomeClasses
 from SomeClasses.CharacterClasses import Character
-from SomeStates import GameStates
-import time
 
 
 char = Character("Дарриан", "Вы тут за эльфа, наемного убийцу", 20, 8, 1, 6)

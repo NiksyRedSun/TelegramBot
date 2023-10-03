@@ -566,9 +566,10 @@ class Character(Unit):
     async def avoid_enemy(self, message, enemy):
         if enemy.quoteIndex is not None:
             await message.answer(text=f"Вы пытаетесь совершить уклонение")
+            self.in_avoid = True
         else:
             await message.answer(text=f"Враг не атакует")
-        self.in_avoid = True
+
 
 
 

@@ -139,7 +139,7 @@ class Villian(Unit):
             if char.in_avoid:
                 char_init = double_dices() + char.initiative
             else:
-                char_init = double_dices()
+                char_init = double_dices() + dice()
 
             if villian_init > char_init:
                 damage = self.attack + dice() - char.defense

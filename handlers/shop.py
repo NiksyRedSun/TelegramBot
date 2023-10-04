@@ -9,7 +9,7 @@ from SomeStates import GameStates, ShopStates
 from SomeClasses.ItemsClasses import HealingPotion
 from SomeKeyboards import menu_keyb
 from aiogram.dispatcher.storage import FSMContext
-
+from Functions import check_and_save
 
 
 async def assortment(message):
@@ -40,6 +40,7 @@ async def buying_things(message, char, cur_item, count):
 
 @dp.message_handler(state=ShopStates.inShopState)
 async def in_shop(message: types.Message, state: FSMContext):
+    char = players_dict[message.chat.id]
     if message.text in all_items_tnames:
         await state.update_data(needitem=message.text)
         await ShopStates.buyState.set()
@@ -47,6 +48,7 @@ async def in_shop(message: types.Message, state: FSMContext):
     elif message.text == "Асортимент":
         await assortment(message)
     elif message.text == "В деревню":
+        await char.do_autosave(message)
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb, parse_mode="HTML")
         await GameStates.menuState.set()
 

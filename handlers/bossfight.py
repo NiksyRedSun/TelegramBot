@@ -24,6 +24,7 @@ from SomeStates import GameStates, DeathStates
 from EasyGameLoader import dp, bot
 from threading import Thread
 import time
+from Functions import check_and_save
 
 
 async def boss_check_team():
@@ -153,6 +154,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
                 current_boss_fight_team.pop(message.chat.id, None)
                 await GameStates.menuState.set()
                 await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
+                await char.do_autosave(message)
 
         else:
             pass

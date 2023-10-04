@@ -21,6 +21,7 @@ from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, temple_keyb, p
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameStates, PersonStates, DeathStates, ShopStates
 from EasyGameLoader import dp
+from Functions import check_and_save
 
 
 
@@ -32,9 +33,11 @@ async def villiage(message: types.Message, state: FSMContext):
         await DeathStates.deadState.set()
         return None
     if message.text == "Бой с боссом":
+        await char.do_autosave(message)
         await GameStates.preBossFight.set()
         await message.answer(text=f"Попробуйте себя в битве с боссом", reply_markup=next_keyb)
     elif message.text == "Бой с мобом":
+        await char.do_autosave(message)
         await GameStates.preMobFight.set()
         await message.answer(text=f"Попробуйте себя в очищении мира от мобов", reply_markup=next_keyb)
     elif message.text == "Фонтан":

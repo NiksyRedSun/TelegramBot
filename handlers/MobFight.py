@@ -11,6 +11,7 @@ from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb,
 from SomeAttributes import players_dict, mob_fight_dict, all_items_dict, all_items_tnames
 from RateLimit import rate_limit, ThrottlingMiddleware
 import asyncio
+from Functions import check_and_save
 
 
 async def mob_check(mob, message):
@@ -35,22 +36,26 @@ async def mob_attack(mob, message):
 
 
 @dp.message_handler(state=GameStates.preMobFight)
-async def pre_boss_fight(message: types.Message, state: FSMContext):
+async def pre_mob_fight(message: types.Message, state: FSMContext):
+    char = players_dict[message.chat.id]
     if message.text == "Выбрать моба":
         mob_fight_dict[message.chat.id] = {"mob": None, "mob_task": None, "mob_check_task": None, "death_mobs": 0}
         await GameStates.mobChoosing.set()
         await message.answer(text="Выбирайте из предложенных")
         await message.answer(text='\n'.join(give_mobs()))
+
     elif message.text == "Вернуться в деревню":
         await GameStates.menuState.set()
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
+        await char.do_autosave(message)
     else:
         await message.answer(text="Выбираете противника и в бой", reply_markup=mob_fight_menu_keyb)
 
 
 
 @dp.message_handler(state=GameStates.mobChoosing)
-async def pre_boss_fight(message: types.Message, state: FSMContext):
+async def mob_choosing(message: types.Message, state: FSMContext):
+    char = players_dict[message.chat.id]
     if message.text in give_mobs_links():
         mob_link = message.text
         mob_fight_dict[message.chat.id]["mob"] = give_mobs(mob_link)
@@ -65,6 +70,7 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
         await message.answer(text=f"Вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов")
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
         mob_fight_dict.pop(message.chat.id, None)
+        await char.do_autosave()
     else:
         await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
         await message.answer(text='\n'.join(give_mobs()))
@@ -73,7 +79,7 @@ async def pre_boss_fight(message: types.Message, state: FSMContext):
 
 @rate_limit(limit=1)
 @dp.message_handler(state=GameStates.mobFight)
-async def boss_fight(message: types.Message, state: FSMContext):
+async def mob_fight(message: types.Message, state: FSMContext):
     char = players_dict[message.chat.id]
     mob = mob_fight_dict[message.chat.id]['mob']
 
@@ -106,6 +112,7 @@ async def boss_fight(message: types.Message, state: FSMContext):
             await GameStates.mobChoosing.set()
             await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
             await message.answer(text='\n'.join(give_mobs()))
+            await char.do_autosave()
 
         elif message.text == "Инвентарь":
             await char.show_inv_in_fight(message)

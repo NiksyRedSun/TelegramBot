@@ -8,13 +8,15 @@ from EasyGameLoader import bot
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb
 from SomeAttributes import all_items, all_items_dict_cost
+import SomeRepos.sqlaORM
 
 
 
 class Character(Unit):
-    def __init__(self, s_name: str, s_story: str, s_max_hp=5, s_attack=0, s_defense=0, s_initiative=0,
-                 s_points=30, s_money=0, s_level=0, s_exp=0, s_next_lvl_exp=100):
+    def __init__(self, s_name: str, s_story: str, s_hp=5, s_max_hp=5, s_attack=0, s_defense=0, s_initiative=0,
+                 s_points=30, s_money=0, s_level=0, s_exp=0, s_next_lvl_exp=100, s_autosave=False):
         super().__init__(s_name, s_story, s_max_hp, s_attack, s_defense, s_initiative)
+        self.hp = s_hp
         self.points = s_points
         self.money = s_money
         self.level = s_level
@@ -34,6 +36,26 @@ class Character(Unit):
         self.effects = {item().name: None for item in all_items}
         self.inventory = []
         self.in_avoid = False
+        self.autosave = s_autosave
+
+
+
+    async def autosave_switch(self, message):
+        if self.autosave:
+            self.autosave = False
+            await message.answer(text="Автосохранение выключено", parse_mode="HTML")
+        else:
+            self.autosave = True
+            await message.answer(text="Автосохранение включено", parse_mode="HTML")
+
+
+    async def do_autosave(self, message):
+        if self.autosave:
+            await message.answer(text=f"Автосохранение, не выключайте телефон")
+            if type(SomeRepos.sqlaORM.get_char(message.chat.id)) != str:
+                await message.answer(text=SomeRepos.sqlaORM.put_char(message.chat.id, self))
+            else:
+                await message.answer(text=SomeRepos.sqlaORM.post_char(message.chat.id, self))
 
 
     def count_objects(self, lst, obj_type):
@@ -42,6 +64,10 @@ class Character(Unit):
             if isinstance(obj, obj_type):
                 count += 1
         return count
+
+
+    def for_saving(self):
+        return [self.name, self.story, self.max_hp, self.attack, self.defense, self.initiative, self.points, self.money, self.level, self.exp]
 
 
 

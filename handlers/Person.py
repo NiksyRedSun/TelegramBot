@@ -47,6 +47,7 @@ async def person_menu(message: types.Message, state: FSMContext):
         await message.answer(text=char.presentation(), parse_mode="HTML")
     elif message.text == "В деревню":
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb, parse_mode="HTML")
+        await char.do_autosave(message)
         await GameStates.menuState.set()
     else:
         await message.answer(text="Здесь вы можете изменить имя, описание или перераспределить очки умений")

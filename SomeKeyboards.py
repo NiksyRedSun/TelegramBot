@@ -45,7 +45,8 @@ shop_keyb = ReplyKeyboardMarkup(
 
 
 temple_keyb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Сохранить")], [KeyboardButton(text="Загрузить")], [KeyboardButton(text="В деревню")]], resize_keyboard=True)
+        keyboard=[[KeyboardButton(text="Сохранить")], [KeyboardButton(text="Загрузить")], [KeyboardButton(text="В деревню"),
+                                                                                           KeyboardButton(text="Автосохранение")]], resize_keyboard=True)
 
 person_keyb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="Изменить имя"), KeyboardButton(text="Изменить описание")],

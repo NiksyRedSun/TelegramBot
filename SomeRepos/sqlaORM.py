@@ -27,6 +27,7 @@ class Characters(Base):
     exp = Column("exp", Integer)
     next_level_exp = Column("next_level_exp", Integer)
     autosave = Column("autosave", Boolean)
+    user_id = Column("user_id", Integer, nullable=True)
 
 
     def __init__(self, id, name, story, hp, max_hp, attack, defense, initiative, points, money, level, exp, next_level_exp, autosave):
@@ -51,7 +52,8 @@ class Characters(Base):
 
 
 #движок
-engine = create_engine("sqlite:///C:\\repos\\tg_bot\\SomeRepos\\TgBotdb.db", echo=True)
+# engine = create_engine("sqlite:///C:\\repos\\tg_bot\\SomeRepos\\TgBotdb.db", echo=True)
+engine = create_engine("sqlite:///C:\\repos\\AutoBlog\\instance\\blog.db", echo=True)
 
 #следующая строка берет все классы сверху, унаследованные от Base и делает из них таблицы
 # Base.metadata.create_all(bind=engine)

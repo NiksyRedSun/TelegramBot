@@ -47,7 +47,6 @@ async def pre_mob_fight(message: types.Message, state: FSMContext):
     elif message.text == "Вернуться в деревню":
         await GameStates.menuState.set()
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
-        await char.do_autosave(message)
     else:
         await message.answer(text="Выбираете противника и в бой", reply_markup=mob_fight_menu_keyb)
 
@@ -66,11 +65,11 @@ async def mob_choosing(message: types.Message, state: FSMContext):
         mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
 
     elif message.text == "Вернуться в деревню":
+        await char.do_autosave(message)
         await GameStates.menuState.set()
         await message.answer(text=f"Вы убили {mob_fight_dict[message.chat.id]['death_mobs']} мобов")
         await message.answer(text="Вы возвращаетесь в деревню", reply_markup=menu_keyb)
         mob_fight_dict.pop(message.chat.id, None)
-        await char.do_autosave()
     else:
         await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
         await message.answer(text='\n'.join(give_mobs()))
@@ -109,10 +108,11 @@ async def mob_fight(message: types.Message, state: FSMContext):
             mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
 
         elif message.text == "К выбору моба" and not mob.alive:
+
             await GameStates.mobChoosing.set()
             await message.answer(text="Выбирайте моба из предложенных", reply_markup=mob_fight_menu_keyb)
             await message.answer(text='\n'.join(give_mobs()))
-            await char.do_autosave()
+
 
         elif message.text == "Инвентарь":
             await char.show_inv_in_fight(message)

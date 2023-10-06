@@ -106,6 +106,7 @@ class Mob(Unit):
         else:
             if char.in_avoid:
                 await message.answer(text="Уклонение успешно")
+                char.stat.successAvoiding += 1
             await message.answer(text=self.pos_quotes[self.quoteIndex])
         self.quoteIndex = None
         char.in_avoid = False

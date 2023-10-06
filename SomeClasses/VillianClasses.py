@@ -82,6 +82,7 @@ class Villian(Unit):
             all_players[player].money += cur_money
             all_players[player].exp += cur_exp
             all_players[player].next_level()
+            all_players[player].stat.bossKill += 1
             await bot.send_message(chat_id=player,
                                    text='\n'.join(text),
                                    parse_mode="HTML",
@@ -168,6 +169,7 @@ class Villian(Unit):
             else:
                 if char.in_avoid:
                     text.append(f"{char.name} успешно совершает уклонение")
+                    char.stat.successAvoiding += 1
                 text.append(self.give_pos_quotes(char))
             text.append("")
         char.in_avoid = False

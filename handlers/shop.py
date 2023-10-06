@@ -28,13 +28,13 @@ async def buying_things(message, char, cur_item, count):
         await message.answer(text="Ну и иди отсюда, если покупать не хочешь")
     else:
         if char.money >= count * cur_item.cost:
-            char.money -= count * cur_item.cost
+            moneyForBuy = count * cur_item.cost
+            char.money -= moneyForBuy
+            char.stat.moneySpend += moneyForBuy
             char.inventory.extend([cur_item for i in range(count)])
             await message.answer(text=f"Вы закупили {count} единиц данного товара")
         else:
             await message.answer(text="У вас не хватает денег, чтобы купить столько")
-
-
 
 
 

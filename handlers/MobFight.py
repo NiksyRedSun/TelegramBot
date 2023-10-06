@@ -14,9 +14,10 @@ import asyncio
 from Functions import check_and_save
 
 
-async def mob_check(mob, message):
+async def mob_check(mob, message, char):
     while True:
         if not mob.alive:
+            char.stat.mobKill += 1
             await asyncio.sleep(0.15)
             await mob.money_exp_having(players_dict[message.chat.id], message)
             mob_fight_dict[message.chat.id]["mob_task"].cancel()
@@ -62,7 +63,7 @@ async def mob_choosing(message: types.Message, state: FSMContext):
         await GameStates.mobFight.set()
         await message.answer(text="Вы уже в бою", reply_markup=attack_menu_keyb)
         mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(mob, message))
-        mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
+        mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message, char))
 
     elif message.text == "Вернуться в деревню":
         await char.do_autosave(message)
@@ -105,7 +106,7 @@ async def mob_fight(message: types.Message, state: FSMContext):
             await message.answer(text="Вы уже в бою", reply_markup=attack_menu_keyb)
             mob_fight_dict[message.chat.id]["mob"].reset()
             mob_fight_dict[message.chat.id]["mob_task"] = asyncio.create_task(mob_attack(mob, message))
-            mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message))
+            mob_fight_dict[message.chat.id]["mob_check_task"] = asyncio.create_task(mob_check(mob, message, char))
 
         elif message.text == "К выбору моба" and not mob.alive:
 

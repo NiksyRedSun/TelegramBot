@@ -56,6 +56,7 @@ class HealingPotion(Item):
             await asyncio.sleep(0.3)
         if self.remove_object(char.inventory, HealingPotion):
             char.effects[self.name] = asyncio.create_task(self.healing(char))
+            char.stat.itemsUsed += 1
             await message.answer(text="Зелье лечения использовано")
         else:
             await message.answer(text="У вас нет зелья лечения в инвентаре")
@@ -94,6 +95,7 @@ class LiqPotion(Item):
                 return None
         if self.remove_object(char.inventory, LiqPotion):
             char.effects[self.name] = asyncio.create_task(self.inqreasing(char))
+            char.stat.itemsUsed += 1
             await message.answer(text="Вы глотнули наливочки")
         else:
             await message.answer(text="У вас нет наливочки")
@@ -127,6 +129,7 @@ class ConcentreationScroll(Item):
                 return None
         if self.remove_object(char.inventory, ConcentreationScroll):
             char.effects[self.name] = asyncio.create_task(self.concentrating(char))
+            char.stat.itemsUsed += 1
             await message.answer(text="Вы прочитывайте свиток концентрации")
         else:
             await message.answer(text="У вас нет свитка концентрации")
@@ -160,6 +163,7 @@ class Poison(Item):
                 return None
         if self.remove_object(char.inventory, Poison):
             char.effects[self.name] = asyncio.create_task(self.poisoning(char))
+            char.stat.itemsUsed += 1
             await message.answer(text="Вы смазываете свое оружие ядом")
         else:
             await message.answer(text="У вас нет яда")

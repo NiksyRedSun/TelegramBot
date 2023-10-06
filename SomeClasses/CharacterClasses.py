@@ -9,6 +9,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb
 from SomeAttributes import all_items, all_items_dict_cost
 import SomeRepos.sqlaORM
+from StatisticsClasses import Statistics
 
 
 
@@ -37,6 +38,7 @@ class Character(Unit):
         self.inventory = []
         self.in_avoid = False
         self.autosave = s_autosave
+        self.stat = Statistics()
 
 
 
@@ -56,6 +58,7 @@ class Character(Unit):
                 await message.answer(text=SomeRepos.sqlaORM.put_char(message.chat.id, self))
             else:
                 await message.answer(text=SomeRepos.sqlaORM.post_char(message.chat.id, self))
+            self.stat = Statistics()
 
 
     def count_objects(self, lst, obj_type):
@@ -284,11 +287,13 @@ class Character(Unit):
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init > villian_init:
+            self.stat.hits += 1
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
                 hit_damage = int(self.attack * 2.5) + int(self.fury*0.05*2.5)
                 critical_hit = True
+                self.stat.criticalHits += 1
             else:
                 hit_damage = self.attack + int(self.fury * 0.05)
 
@@ -396,11 +401,13 @@ class Character(Unit):
         mob_init = double_dices() + mob.initiative
 
         if hero_init > mob_init:
+            self.stat.hits += 1
 
             crit = random.randint(1, 100)
             if crit in range(1, self.initiative * 6):
                 hit_damage = int(self.attack * 2.5) + int(self.fury*0.05*2.5)
                 critical_hit = True
+                self.stat.criticalHits += 1
             else:
                 hit_damage = self.attack + int(self.fury * 0.05)
 
@@ -474,6 +481,7 @@ class Character(Unit):
                         self.effects[effect] = None
                     else:
                         self.effects[effect] = None
+            self.stat.death += 1
 
 
     def remove_effects(self):
@@ -495,6 +503,7 @@ class Character(Unit):
         else:
             self.hp = self.max_hp
             await message.answer(text=f"Фонтан залечил каждую рану на вашем теле")
+        self.stat.fountainHealing += 1
 
 
     def five_second_healing(self):
@@ -531,6 +540,7 @@ class Character(Unit):
         hero_init = double_dices() + self.initiative
         villian_init = double_dices() + villian.initiative
         if hero_init - villian_init > 2:
+            self.stat.leavingBossFights += 1
             for player in players.copy():
                 if message.chat.id != player:
                     await bot.send_message(chat_id=player, text=f"{self.name} удачно соскочил с битвы", parse_mode="HTML")
@@ -571,6 +581,7 @@ class Character(Unit):
         hero_init = double_dices() + self.initiative
         mob_init = double_dices() + mob.initiative
         if hero_init - mob_init > 2:
+            self.stat.leavingMobFights += 1
             return True
         else:
             init = dice()

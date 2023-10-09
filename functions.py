@@ -4,7 +4,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeClasses.VillianClasses import Villian, TreeVillian, GolemVillian, DragonVillian, SpiderVillian, WyvernVillian, ToadVillian
 from SomeClasses.MobClasses import SceletonMob, LittleDragonMob, OrcMob, ElvenArcherMob, ElvenWizardMob
 from SomeKeyboards import attack_menu_keyb, menu_keyb, end_menu_keyb, mob_next_keyb, next_keyb
-from SomeRepos.sqlaORM import get_char, post_char, put_char
+from SomeRepos.sqlaORM import get_char, post_char, put_char, get_stat, post_stat, put_stat
 
 
 def double_dices():
@@ -88,6 +88,14 @@ async def check_and_save(char, message):
         await message.answer(text=put_char(message.chat.id, char))
     else:
         await message.answer(text=post_char(message.chat.id, char))
+
+
+async def check_and_save_stat(stat, message):
+    if not get_stat(message.chat.id):
+        await message.answer(text=post_stat(message.chat.id, stat))
+    else:
+        await message.answer(text=put_stat(message.chat.id, stat))
+
 
 
 def give_villian():

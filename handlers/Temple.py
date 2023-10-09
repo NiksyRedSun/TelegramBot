@@ -14,7 +14,7 @@ from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameStates
 from EasyGameLoader import dp
 from SomeRepos.sqlaORM import get_char, delete_char, post_char, put_char
-from Functions import check_and_save
+from Functions import check_and_save, check_and_save_stat
 from SomeClasses.StatisticsClasses import Statistics
 
 
@@ -24,6 +24,7 @@ async def temple(message: types.Message, state: FSMContext):
     if message.text == "Сохранить":
         char = players_dict[message.chat.id]
         await check_and_save(char, message)
+        await check_and_save_stat(char.stat, message)
         char.stat = Statistics()
     elif message.text == "Загрузить":
         try:

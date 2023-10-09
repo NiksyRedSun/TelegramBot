@@ -9,7 +9,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ContentType
 from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb, mob_next_keyb
 from SomeAttributes import all_items, all_items_dict_cost
 import SomeRepos.sqlaORM
-from StatisticsClasses import Statistics
+from SomeClasses.StatisticsClasses import Statistics
+import Functions
 
 
 
@@ -54,10 +55,8 @@ class Character(Unit):
     async def do_autosave(self, message):
         if self.autosave:
             await message.answer(text=f"Автосохранение, не выключайте телефон")
-            if type(SomeRepos.sqlaORM.get_char(message.chat.id)) != str:
-                await message.answer(text=SomeRepos.sqlaORM.put_char(message.chat.id, self))
-            else:
-                await message.answer(text=SomeRepos.sqlaORM.post_char(message.chat.id, self))
+            await Functions.check_and_save(self, message)
+            await Functions.check_and_save_stat(self.stat, message)
             self.stat = Statistics()
 
 

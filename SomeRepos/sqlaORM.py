@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, select, Table, Column, Integer, String, MetaData, ForeignKey, Text, CHAR, Boolean
+from sqlalchemy import create_engine, select, Table, Column, Integer, String, MetaData, ForeignKey, Text, CHAR, Boolean, ForeignKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import SomeClasses.CharacterClasses
+import SomeClasses.StatisticsClasses
 
 
 
@@ -49,6 +50,49 @@ class Characters(Base):
 
     def __repr__(self):
         return f"Имя персонажа:{self.name}, уровень: {self.level}"
+
+
+
+class Statistics(Base):
+    __tablename__ = "Statistics"
+
+
+    id = Column("id", Integer, primary_key=True)
+    mobKill = Column("mobKill", Integer)
+    bossKill = Column("bossKill", Integer)
+    death = Column("death", Integer)
+    itemsUsed = Column("itemsUsed", Integer)
+    moneySpend = Column("moneySpend", Integer)
+    fountainHealing = Column("fountainHealing", Integer)
+    hits = Column("hits", Integer)
+    criticalHits = Column("criticalHits", Integer)
+    successAvoiding = Column("successAvoiding", Integer)
+    leavingBossFights = Column("leavingBossFights", Integer)
+    leavingMobFights = Column("leavingMobFights", Integer)
+    char_id = Column("char_id", Integer, ForeignKey("Characters.id"), nullable=True)
+
+
+
+    def __init__(self, mobKill, bossKill, death, itemsUsed, moneySpend, fountainHealing, hits, criticalHits,
+                 successAvoiding, leavingBossFights, leavingMobFights, char_id):
+        self.mobKill = mobKill
+        self.bossKill = bossKill
+        self.death = death
+        self.itemsUsed = itemsUsed
+        self.moneySpend = moneySpend
+        self.fountainHealing = fountainHealing
+        self.hits = hits
+        self.criticalHits = criticalHits
+        self.successAvoiding = successAvoiding
+        self.leavingBossFights = leavingBossFights
+        self.leavingMobFights = leavingMobFights
+        self.char_id = char_id
+
+
+    def __repr__(self):
+        return f"Stat id: {self.id}, char id: {self.char_id}"
+
+
 
 
 #движок
@@ -110,7 +154,7 @@ def put_char(id: int, char):
             return "Ваш персонаж успешно обновлен"
         except:
             session.rollback()
-            return "Что-то пошло не так"
+            return "Что-то пошло не так при обновлении статистики"
 
 
 def delete_char(id: int):
@@ -123,6 +167,77 @@ def delete_char(id: int):
         except:
             session.rollback()
             return "Что-то пошло не так"
+
+
+
+def get_stat(id):
+    with Session() as session:
+        try:
+            stat = session.query(Statistics).filter(Statistics.char_id==id).first()
+            if not stat:
+                print("Статистика не обнаружена")
+                return False
+            # return SomeClasses.StatisticsClasses.Statistics(mobKill=stat.mobKill, bossKill=stat.bossKill, death=stat.death,
+            #                                                 itemsUsed=stat.itemUsed, moneySpend=stat.moneySpend, fountainHealing=stat.fountainHealing,
+            #                                                 hits=stat.hits, criticalHits=stat.criticalHits, successAvoiding=stat.successAvoiding,
+            #                                                 leavingBossFights=stat.leavingBossFight, leavingMobFights=stat.leavingMobFights)
+            return stat
+        except:
+            return "Что-то пошло не так при загрузке статистики"
+
+
+
+def post_stat(id: int, stat):
+    with Session() as session:
+        try:
+            dbStat = Statistics(mobKill=stat.mobKill, bossKill=stat.bossKill, death=stat.death,
+                            itemsUsed=stat.itemsUsed, moneySpend=stat.moneySpend, fountainHealing=stat.fountainHealing,
+                            hits=stat.hits, criticalHits=stat.criticalHits, successAvoiding=stat.successAvoiding,
+                              leavingBossFights=stat.leavingBossFights, leavingMobFights=stat.leavingMobFights, char_id=id)
+
+            session.add(dbStat)
+            session.commit()
+            return "Статистика успешно сохранена"
+        except Exception as e:
+            print(e)
+            session.rollback()
+            return "Что-то пошло не так при сохранении статистики"
+
+
+
+def put_stat(id: int, gamestat):
+    with Session() as session:
+        try:
+            bdstat = session.query(Statistics).filter(Statistics.char_id==id).first()
+            bdstat.mobKill += gamestat.mobKill
+            bdstat.bossKill += gamestat.bossKill
+            bdstat.death += gamestat.death
+            bdstat.itemsUsed += gamestat.itemsUsed
+            bdstat.moneySpend += gamestat.moneySpend
+            bdstat.fountainHealing += gamestat.fountainHealing
+            bdstat.hits += gamestat.hits
+            bdstat.criticalHits += gamestat.criticalHits
+            bdstat.successAvoiding += gamestat.successAvoiding
+            bdstat.leavingBossFights += gamestat.leavingBossFights
+            bdstat.leavingMobFights += gamestat.leavingMobFights
+            session.commit()
+            return "Статистика успешно обновлена"
+        except Exception as e:
+            print(e)
+            session.rollback()
+            return "Что-то пошло не так при обновлении статистики"
+
+def delete_stat(id: int):
+    with Session() as session:
+        try:
+            st = session.query(Statistics).filter(Statistics.char_id==id).first()
+            session.delete(st)
+            session.commit()
+            return "Ваша статистика успешно удалена"
+        except:
+            session.rollback()
+            return "Что-то пошло не так"
+
 
 
 # print(get_char(218656239))

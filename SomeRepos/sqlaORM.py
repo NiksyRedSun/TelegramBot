@@ -28,6 +28,7 @@ class Characters(Base):
     exp = Column("exp", Integer)
     next_level_exp = Column("next_level_exp", Integer)
     autosave = Column("autosave", Boolean)
+    items_available = Column("items_available", Integer)
     user_id = Column("user_id", Integer, nullable=True)
 
 
@@ -86,6 +87,33 @@ class Statistics(Base):
         self.successAvoiding = successAvoiding
         self.leavingBossFights = leavingBossFights
         self.leavingMobFights = leavingMobFights
+        self.char_id = char_id
+
+
+    def __repr__(self):
+        return f"Stat id: {self.id}, char id: {self.char_id}"
+
+
+
+
+class Items(Base):
+    id = Column("id", Integer, primary_key=True)
+    itemName = Column("itemName", String(50))
+    itemMaxHp = Column("itemMaxHp", Integer)
+    itemAttack = Column("itemAttack", Integer)
+    itemDefense = Column("itemDefense", Integer)
+    itemInitiative = Column("itemInitiative", Integer)
+    forAttack = Column("forAttack", Boolean)
+    char_id = Column("char_id", Integer, ForeignKey("Characters.id"), nullable=True)
+
+
+    def __init__(self, itemName, itemMaxHp, itemAttack, itemDefense, itemInitiative, forAttack, char_id):
+        self.itemName = itemName
+        self.itemMaxHp = itemMaxHp
+        self.itemAttack = itemAttack
+        self.itemDefense = itemDefense
+        self.itemInitiative = itemInitiative
+        self.forAttack = forAttack
         self.char_id = char_id
 
 
@@ -177,10 +205,6 @@ def get_stat(id):
             if not stat:
                 print("Статистика не обнаружена")
                 return False
-            # return SomeClasses.StatisticsClasses.Statistics(mobKill=stat.mobKill, bossKill=stat.bossKill, death=stat.death,
-            #                                                 itemsUsed=stat.itemUsed, moneySpend=stat.moneySpend, fountainHealing=stat.fountainHealing,
-            #                                                 hits=stat.hits, criticalHits=stat.criticalHits, successAvoiding=stat.successAvoiding,
-            #                                                 leavingBossFights=stat.leavingBossFight, leavingMobFights=stat.leavingMobFights)
             return stat
         except:
             return "Что-то пошло не так при загрузке статистики"

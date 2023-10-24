@@ -10,6 +10,7 @@ from SomeKeyboards import next_keyb, end_menu_keyb, attack_menu_keyb, menu_keyb,
 from SomeAttributes import all_items, all_items_dict_cost
 import SomeRepos.sqlaORM
 from SomeClasses.StatisticsClasses import Statistics
+from SomeClasses.EquipmentClasses import Equipment
 import Functions
 
 
@@ -40,7 +41,44 @@ class Character(Unit):
         self.in_avoid = False
         self.autosave = s_autosave
         self.stat = Statistics()
+        self.equipment = []
 
+
+
+
+    def put_on_eqp_on_load(self, its):
+        if its:
+            for it in its:
+                if it.itemName is not None:
+                    self.equipment.append(Equipment(it.itemName, it.itemMaxHp, it.itemAttack, it.itemDefense, it.itemInitiative, it.forAttack))
+        self.put_on_eqp()
+
+
+
+    def put_on_eqp(self):
+        for eq in self.equipment:
+            self.max_hp += eq.itemMaxHp
+            self.attack += eq.itemAttack
+            self.defense += eq.itemDefense
+            self.initiative += eq.itemInitiative
+
+
+    def put_off_eqp(self):
+        for eq in self.equipment:
+            self.max_hp -= eq.itemMaxHp
+            self.attack -= eq.itemAttack
+            self.defense -= eq.itemDefense
+            self.initiative -= eq.itemInitiative
+
+
+    def show_equipment(self):
+        if self.equipment:
+            text = ["На вас надето:"]
+            for eq in self.equipment:
+                text.extend(eq.info())
+            return '\n'.join(text)
+        else:
+            return "На вас ничего не надето"
 
 
     async def autosave_switch(self, message):
@@ -54,10 +92,12 @@ class Character(Unit):
 
     async def do_autosave(self, message):
         if self.autosave:
+            self.put_off_eqp()
             await message.answer(text=f"Автосохранение, не выключайте телефон")
             await Functions.check_and_save(self, message)
             await Functions.check_and_save_stat(self.stat, message)
             self.stat = Statistics()
+            self.put_on_eqp()
 
 
     def count_objects(self, lst, obj_type):
@@ -81,9 +121,10 @@ class Character(Unit):
                 message_text.append(item().show_in_inv(count))
 
         if message_text:
+            message_text.insert(0, "Ваши расходные материалы:")
             await message.answer(text='\n'.join(message_text))
         else:
-            await message.answer(text="Ваш инвентарь пуст")
+            await message.answer(text="У вас нет никаких расходных материалов")
 
 
     async def show_inv_in_fight(self, message):
@@ -239,12 +280,14 @@ class Character(Unit):
                 else:
                     return "Вам не хватает очков умений"
             case "reload":
+                    self.put_off_eqp()
                     self.points += int((self.max_hp - 5)/5 + self.attack + self.defense + self.initiative*3)
                     self.max_hp = 5
                     self.hp = 5
                     self.attack = 0
                     self.defense = 0
                     self.initiative = 0
+                    self.put_on_eqp()
                     return f"Вы обнулили очки умений\nКоличество очков умений теперь: {self.points} "
 
 

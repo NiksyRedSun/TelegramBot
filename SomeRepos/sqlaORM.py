@@ -97,6 +97,9 @@ class Statistics(Base):
 
 
 class Items(Base):
+    __tablename__ = "Items"
+
+
     id = Column("id", Integer, primary_key=True)
     itemName = Column("itemName", String(50))
     itemMaxHp = Column("itemMaxHp", Integer)
@@ -135,11 +138,21 @@ Session = sessionmaker(bind=engine)
 
 
 
+def get_items(char_id):
+    with Session() as session:
+        try:
+            its = session.query(Items).filter(Items.char_id == char_id).all()
+            return its
+        except:
+            return "Что-то пошло не так при загрузке вещей"
+
+
+
 def get_char(id):
     with Session() as session:
         try:
             char = session.query(Characters).filter(Characters.id==id).first()
-            return SomeClasses.CharacterClasses.Character(char.name, char.story, char.hp, char.max_hp, char.attack, char.defense, char.initiative, char.points,
+            return SomeClasses.CharacterClasses.Character(char.name, char.story, char.max_hp, char.max_hp, char.attack, char.defense, char.initiative, char.points,
                                                           char.money, char.level, char.exp, char.next_level_exp, char.autosave)
         except:
             return "Что-то пошло не так при загрузке персонажа"
@@ -150,7 +163,7 @@ def post_char(id: int, char):
         char.remove_effects()
         with Session() as session:
             try:
-                char = Characters(id=id, name=char.name, story=char.story, hp=char.hp, max_hp=char.max_hp, attack=char.attack,
+                char = Characters(id=id, name=char.name, story=char.story, hp=char.max_hp, max_hp=char.max_hp, attack=char.attack,
                                   defense=char.defense, initiative=char.initiative, points=char.points, money=char.money, level=char.level, exp=char.exp,
                                   next_level_exp=char.next_level_exp, autosave=char.autosave)
                 session.add(char)
@@ -168,7 +181,7 @@ def put_char(id: int, char):
             ch = session.query(Characters).filter(Characters.id==id).first()
             ch.name = char.name
             ch.story = char.story
-            ch.hp = char.hp
+            ch.hp = char.max_hp
             ch.max_hp = char.max_hp
             ch.attack = char.attack
             ch.defense = char.defense

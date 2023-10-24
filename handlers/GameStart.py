@@ -20,7 +20,7 @@ from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, start_keyb, to
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import StartStates, GameStates
 from EasyGameLoader import dp
-from SomeRepos.sqlaORM import get_char
+from SomeRepos.sqlaORM import get_char, get_items
 from SomeClasses.CharacterClasses import Character
 
 
@@ -54,12 +54,15 @@ async def get_some_char(message: types.Message):
     try:
         char = get_char(message.chat.id)
         players_dict[message.chat.id] = char
-        await message.answer(text=char.presentation(), parse_mode="HTML", reply_markup=next_keyb)
+        char.put_on_eqp_on_load(get_items(message.chat.id))
         await message.answer(text=f"Ваш персонаж {char.name} успешно загружен")
+        await message.answer(text=char.presentation(), parse_mode="HTML", reply_markup=next_keyb)
+        await message.answer(text=char.show_equipment(), parse_mode="HTML")
         await GameStates.menuState.set()
-    except:
+    except Exception as e:
         await message.answer(text=f"Ваш id не найден в базе данных. Для повторной попытки нажмите на кнопку еще раз\n"
                                   f"Иначе нажмите 'Старт'")
+        print(e)
 
 
 @dp.message_handler(state=StartStates.nameChoice)

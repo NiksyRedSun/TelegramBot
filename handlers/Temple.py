@@ -13,7 +13,7 @@ from SomeKeyboards import menu_keyb, attack_menu_keyb, next_keyb, start_keyb, to
 from SomeAttributes import players_dict, current_boss_fight_team
 from SomeStates import GameStates
 from EasyGameLoader import dp
-from SomeRepos.sqlaORM import get_char, delete_char, post_char, put_char
+from SomeRepos.sqlaORM import get_char, delete_char, post_char, put_char, get_items
 from Functions import check_and_save, check_and_save_stat
 from SomeClasses.StatisticsClasses import Statistics
 
@@ -30,7 +30,10 @@ async def temple(message: types.Message, state: FSMContext):
         try:
             char = get_char(message.chat.id)
             players_dict[message.chat.id] = char
+            char.put_on_eqp_on_load(get_items(message.chat.id))
             await message.answer(text=f"Ваш персонаж {char.name} успешно загружен")
+            await message.answer(text=char.presentation(), parse_mode="HTML", reply_markup=next_keyb)
+            await message.answer(text=char.show_equipment(), parse_mode="HTML")
         except:
             await message.answer(text=f"Ваш id не найден в базе данных. Для повторной попытки нажмите на кнопку еще раз")
 

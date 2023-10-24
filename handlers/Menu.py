@@ -53,16 +53,20 @@ async def villiage(message: types.Message, state: FSMContext):
         await show_players(players_dict, message)
     elif message.text == "Персонаж":
         await message.answer(text=char.presentation(), parse_mode="HTML")
+        await message.answer(text=char.show_equipment(), parse_mode="HTML")
         await message.answer(text="В меню персонажа вы можете поменять имя, описание персонажа,"
                                   " распределить или перераспределить очки умений", parse_mode="HTML",
                              reply_markup=person_keyb)
         await message.answer(text=f"ID персонажа: {message.chat.id}", parse_mode="HTML")
         await message.answer(text=f"Вы также можете посмотреть на персонажа в Автоблоге через его ID", parse_mode="HTML")
         await PersonStates.personMenu.set()
+
     elif message.text == "Магазин":
         await ShopStates.inShopState.set()
         await message.answer(text="Добро пожаловать в лавку братьев Каровановых, что вас интересует?", reply_markup=shop_keyb)
+
     elif message.text == "Инвентарь":
+        await message.answer(text=char.show_equipment(), parse_mode="HTML")
         await char.show_inv(message)
         await message.answer(text="Кроме эликсиров и снадобий, вы получаете право на вещь каждый 10ый уровень. Создать вещь"
                                   "можно на полуночном автоблоге", parse_mode="HTML")

@@ -84,10 +84,12 @@ async def mob_fight_presentantion(char, mob, message):
 
 
 async def check_and_save(char, message):
+    char.put_off_eqp()
     if type(get_char(message.chat.id)) != str:
         await message.answer(text=put_char(message.chat.id, char))
     else:
         await message.answer(text=post_char(message.chat.id, char))
+    char.put_on_eqp()
 
 
 async def check_and_save_stat(stat, message):
